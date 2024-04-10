@@ -1,16 +1,16 @@
 course_content <-
   tibble::tribble(
     ~Day, ~Time, ~Title,
-    "June 06", "10:00-11:30", "Introduction to GIS",
-    "June 06", "11:45-13:00", "Vector Data",
-    "June 06", "13:00-14:00", "Fingerfood@GESIS",
-    "June 06", "14:00-15:30", "Mapping",
-    "June 06", "15:45-17:00", "Raster Data",
-    "June 07", "09:00-10:30", "Advanced Data Import & Processing",
-    "June 07", "10:45-12:00", "Applied Data Wrangling & Linking",
-    "June 07", "12:00-13:00", "Lunch Break",
-    "June 07", "13:00-14:30", "Investigating Spatial Autocorrelation",
-    "June 07", "14:45-16:00", "Spatial Econometrics & Outlook"
+    "April 23", "10:00-11:30", "Introduction to GIS",
+    "April 23", "11:45-13:00", "Vector Data",
+    "April 23", "13:00-14:00", "Lunch Break",
+    "April 23", "14:00-15:30", "Mapping",
+    "April 23", "15:45-17:00", "Raster Data",
+    "April 24", "09:00-10:30", "Advanced Data Import & Processing",
+    "April 24", "10:45-12:00", "Applied Data Wrangling & Linking",
+    "April 24", "12:00-13:00", "Lunch Break",
+    "April 24", "13:00-14:30", "Investigating Spatial Autocorrelation",
+    "April 24", "14:45-16:00", "Spatial Econometrics & Outlook"
   ) %>%
   knitr::kable() %>%
   kableExtra::kable_styling() %>%
