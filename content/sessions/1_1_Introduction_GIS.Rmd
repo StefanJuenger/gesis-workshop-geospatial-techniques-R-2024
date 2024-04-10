@@ -2,7 +2,7 @@
 title: "Introduction to Geospatial Techniques for Social Scientists in R"
 subtitle: "Introduction to GIS"
 author: "Stefan Jünger & Anne-Kathrin Stroppe"
-date: June 06, 2022
+date: April 23, 2024
 institute: |
   GESIS Workshop
 presenter: Stefan
@@ -55,7 +55,7 @@ We will show the use of packages we exploit in practice
 ## Prerequisites for This Course
 
 .pull-left[
-- At least basic knowledge of `R`, its syntax, and internal logic
+- Knowledge of `R`, its syntax, and internal logic
   - Affinity for using script-based languages
   - Don't be scared to wrangle data with complex structures
 - Working versions of `R` (and `Rstudio`) on your computer 
@@ -90,7 +90,7 @@ woRkshoptools::include_picture("Stefan.png")
 - Research interests:
   - Quantitative methods & Geographic Information Systems (GIS)
   - Social inequalities & attitudes towards minorities
-  - Data management & data privacy
+  - Environmental attitudes
   - Reproducible research
 
 .small[
@@ -143,7 +143,7 @@ woRkshoptools::include_picture("so-tell-me-5be02d.jpg")
 - Feel free to ask questions at any time
 - Slides and other materials are available at
 
-.center[`https://github.com/StefanJuenger/gesis-workshop-geospatial-techniques-R-2023`]
+.center[`https://github.com/StefanJuenger/gesis-workshop-geospatial-techniques-R-2024`]
 
 ---
 
@@ -191,30 +191,20 @@ woRkshoptools::include_picture("nature_prejudice.png")
 ]
 
 .pull-right[
-A lot of classic theories have space embedded
+A lot of classic theories inherently make use of space
 
 For example, in Allport's (1954) contact theory, he at least implicitly assumes that people meet in a set space
 ]
 
 ---
 
-## Today’s Research Is Not Necessarily New
+## And another example
 
-.pull-left[
-```{r park-etal-pic, echo = FALSE}
+
+```{r park-etal-pic, echo = FALSE, out.width = "50%"}
 woRkshoptools::include_picture("park_etal.png")
 ```
 .tinyisher[Park et al. 1925]
-]
-
---
-
-.pull-right[
-```{r our-stuff-pic, echo = FALSE}
-woRkshoptools::include_picture("fig_halo_example.png")
-```
-.tinyisher[Jünger 2019]
-]
 
 ---
 
@@ -262,7 +252,7 @@ woRkshoptools::include_picture("fig_geometries.png")
 
 ---
 
-## Geospatial Data in This Course I
+## Geospatial Data in This Course I #WIP
 
 In the folder called `./data` in the same folder as the other materials for this workshop, you can find the data files prepped for all the exercises and slides. The following data are included:
 
@@ -274,7 +264,7 @@ In the folder called `./data` in the same folder as the other materials for this
 
 ---
 
-## Geospatial Data in This Course II
+## Geospatial Data in This Course II #WIP
 
 -  Election Results for the German Right-Wing Populist Party *AfD* in the 2021 German federal election ([Der Bundeswahlleiter, Wiesbaden 2018](https://www.bundeswahlleiter.de/bundestagswahlen/2017/ergebnisse/weitere-ergebnisse.html)).
 
@@ -351,12 +341,10 @@ woRkshoptools::include_picture("fig_projections.png")
 ## Types of CRS
 
 **Geographic CRS**
-- description of specific points
-- perfect for navigation as it creates straight lines between points
+- span the entire earth
 
 **Projected CRS**
-- projection of geometries on a (flat) surface
-- straight lines become bent lines
+- projection of specific geometries on a (flat) surface
 
 (There are also geocentric CRS requiring a z-coordinate...)
 
@@ -420,26 +408,9 @@ PROJCS["ETRS89 / LAEA Europe",
 ## Current Transition From `PROJ.4` to `WKT` in `R`
 
 Currently, there's a transition from the bit old standard of `PROJ.4` to `WKT` in many `R` packages.
-- sometimes, you'll get warnings (see next slide)
+- sometimes, you'll get warnings
 - you should check what's causing the warning
 - in the best case, they will disappear in the future
-
-However, for the operations we are going to show...
-
-
----
-
-## ...Just Ignore the Warnings
-
-You may particularly face some warnings when using the `raster` package. Again, as always in `R`, that's just a warning. [You can ignore it](https://gis.stackexchange.com/questions/365296/setting-crs-of-raster-to-epsg-3035-using-r) since it's a result of the current transition of CRS definitions in individual packages.
-
-```
-Warning message:
-In showSRID(uprojargs, format = "PROJ", multiline = "NO") :
-  Discarded datum European_Terrestrial_Reference_System_1989 in CRS definition
-```
-
-We have turned these warnings off for legibility reasons in our slides.
 
 ---
 
@@ -465,42 +436,14 @@ woRkshoptools::include_picture("ImageEPSGlogo.gif")
 
 ## More Details on Geospatial Data
 
-Let's learn about geospatial data as we learn about specific formats:
-- vector data 
-- raster data
+Let's learn about geospatial data as we learn about specific formats
 
-.pull-left[
-```{r geo-real-worls, echo = FALSE, out.width="75%"}
+```{r geo-real-worls, echo = FALSE, out.width="50%"}
 woRkshoptools::include_picture("Raster-and-Vector-data-types-as-representative-of-real-world-geographic-space_W640.jpg")
 ```
 
 .tinyisher[.center[[Source](https://dx.doi.org/10.13140/2.1.3030.1767)]]
-]
 
-.pull-right[
-Be assured: `R` can serve as a full-blown Geographic Information System (GIS) for all these different data types.
-]
-
----
-
-## `R` Packages for Geospatial Data
-
-There have been packages for geospatial data in `R` already for a long time.
-- [`sp`](https://cran.r-project.org/web/packages/sp/index.html) for vector data
-- [`raster`](https://cran.r-project.org/web/packages/raster/index.html) for raster data
-
-.pull-left[
-Cutting-edge for vector data
-- [`sf`](https://cran.r-project.org/web/packages/sf/index.html), which implements the [ISO 19125](https://www.iso.org/standard/40114.html) standard for geospatial data, called "simple features".
-]
-
-.pull-right[
-```{r pic-sf, echo = FALSE, out.width = "75%"}
-woRkshoptools::include_picture("sf.jpg")
-```
-
-.tinyisher[Illustration by [Allison Horst](https://github.com/allisonhorst/stats-illustrations)]
-]
 
 ---
 
@@ -538,86 +481,10 @@ We will use plenty of different packages during the course, but only a few are o
 class: middle
 ## Exercise 1_1_1: Package Installation
 
-[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/exercises/1_1_1_Package_Installation.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_1_1_Package_Installation.html)
 
-[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/solutions/1_1_1_Package_Installation.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_1_1_Package_Installation.html)
 
----
-
-class: middle
-## Some Last Notes on Using `R`
-
----
-
-## What Is `R`?
-
->R is a free software environment for statistical computing and graphics. It compiles and runs on a wide variety of UNIX platforms, Windows and MacOS ([`R` Project website](https://www.r-project.org/)).
-
-`R` is [free and open-source software (FOSS)](https://en.wikipedia.org/wiki/Free_and_open-source_software) and also a programming language. More specifically, it is a free, non-commercial implementation of the [`S` programming language](https://en.wikipedia.org/wiki/S_(programming_language) (developed by Bell Laboratories).
-
----
-
-## Base `R` vs. `Tidyverse`
-
-There's only one `R`. However, due to the enormous amount of additional packages, routines for similar purposes can shape up rather differently.
-
-A prime example is the [`Tidyverse`](https://www.tidyverse.org/)
-- collection of packages for data science
-- tools to import, wrangle, and visualize data
-
-`Tidyverse` is sometimes a bit easier for beginners
-- verbs in the `dplyr` package
-- non-standard evaluation (`column_name` vs. `"column_name"`)
-- pipes (in contrast to nested functions)
-
----
-
-## Piping In `R`
-
-Usually, in `R` we apply functions as follows:
-
-```{r function-r, eval = FALSE}
-f(x)
-```
-
-In the logic of pipes this function is written as:
-
-```{r function-pipe,  eval = FALSE}
-x %>% f(.)
-```
-
---
-
-We can use pipes on more than one function:
-
-```{r function-pipe-2, eval = FALSE}
-x %>% 
-  f_1() %>% 
-  f_2() %>% 
-  f_3()
-```
-
-More details: https://r4ds.had.co.nz/pipes.html
-
----
-
-## Namespaces `::`
-
-I (Stefan) heavily use namespace declarations in code: `::`. It's a way to safely call a function if there are the same function names in other packages loaded. Usually, you don't need that, but it's a transparent way to show from which package you call which function. 
-
-No namespaces:
-
-```{r without-namespaces, eval = FALSE}
-library(sf)
-
-st_buffer(fancy_data, 500) 
-```
-
-With namespaces:
-
-```{r namespaces, eval = FALSE}
-sf::st_buffer(fancy_data, 500)
-```
 
 <!-- STOP WITH SLIDES HERE -->
 
