@@ -11,12 +11,12 @@ course_content <-
     "April 24", "12:00-13:00", "Lunch Break",
     "April 24", "13:00-14:30", "Investigating Spatial Autocorrelation",
     "April 24", "14:45-16:00", "Spatial Econometrics & Outlook"
-  ) %>%
-  knitr::kable() %>%
-  kableExtra::kable_styling() %>%
-  kableExtra::column_spec(1, color = "gray") %>%
-  kableExtra::column_spec(2, color = "gray") %>%
-  kableExtra::column_spec(3, bold = TRUE) %>%
-  kableExtra::row_spec(3, color = "gray") %>%
-  kableExtra::row_spec(8, color = "gray") %>%
+  ) |>
+  knitr::kable() |>
+  kableExtra::kable_styling() |>
+  kableExtra::column_spec(1, color = "gray") |>
+  kableExtra::column_spec(2, color = "gray") |>
+  kableExtra::column_spec(3, bold = TRUE) |>
+  kableExtra::row_spec(3, color = "gray") |>
+  kableExtra::row_spec(8, color = "gray") |>
   kableExtra::row_spec(5, extra_css = "border-bottom: 1px solid")
