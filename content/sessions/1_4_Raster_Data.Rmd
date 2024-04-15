@@ -2,7 +2,7 @@
 title: "Introduction to Geospatial Techniques for Social Scientists in R"
 subtitle: "Raster Data"
 author: "Stefan Jünger & Anne-Kathrin Stroppe"
-date: June 06, 2022
+date: April 23, 2024
 institute: |
   GESIS Workshop
 presenter: Stefan
@@ -19,7 +19,7 @@ layout: true
 ## Now
 
 ```{r course-content-now, echo = FALSE}
-course_content %>%
+course_content |>
   kableExtra::row_spec(5, background = "yellow")
 ```
 
@@ -28,28 +28,26 @@ course_content %>%
 ## `R`-Packages *We* Will Use
 
 - `terra` 
-  - nowadays the major workhorse for raster data
-  - it's the successor to the `raster` package
+- nowadays the major workhorse for raster data
+- it's the successor to the `raster` package
 - `stars`
-  - interface to modern geospatial data implementations, most and foremost from `sf`
-  - package for spatiotemporal datacubes and non-regular raster grids (more on that at the end of the session)
-  - we will use it only as a supportive package for specific purposes
+- interface to modern geospatial data implementations, most and foremost from `sf`
+- package for spatiotemporal datacubes and non-regular raster grids (more on that at the end of the session)
+- we will use it only as a supportive package for specific purposes
 
 ---
 
 ## General Difference to Vector Data
 
 Data Structure:
-- Other data format(s)
+- Other data format(s), different file extensions
 - geometries do not differ within one dataset
-- sometimes smaller, sometimes larger...
-
 
 Implications:
 - Other geospatial operations possible
-- can be way more efficient
 
 Benefits:
+- can be way more efficient
 - straightforward processing of raster values and extraction of zonal statistics
 - it's like working with simple tabular data
 
@@ -67,32 +65,33 @@ woRkshoptools::include_picture("fig_geometries.png")
 
 - Hold information on (most of the time) evenly shaped grid cells
 - Basically, a simple data table
-  - each cell represents one observation
-  
+- each cell represents one observation
+
 ```{r fig-from-table-to-raster, echo = FALSE}
 woRkshoptools::include_picture("table_to_raster.png")
 ```
-  
+
 ---
 
 ## Metadata
 
-- Information about geometries are globally stored as they are the same for all observation
-  - their location in space is defined by their cell location in the data table
-- Without this information, raster data are simple image files
+- Information about geometries are globally stored
+- they are the same for all observations
+- their location in space is defined by their cell location in the data table
+- Without this information, raster data were simple image files
 
 ---
 
 ## Important Metadata
 
 - Raster Dimensions
-  - number of columns, rows, and cells
+- number of columns, rows, and cells
 - Extent
-  - Similar to bounding box in vector data
+- Similar to bounding box in vector data
 - Resolution
-  - size of each raster cell
+- size of each raster cell
 - Coordinate reference system
-  - defines where on earth's surface the raster layer lies
+- defines where on earth's surface the raster layer lies
 
 ---
 
@@ -108,7 +107,7 @@ terra::rast()
 
 ```{r fill-raster}
 input_data <- 
-  sample(1:100, 16) %>% 
+  sample(1:100, 16) |> 
   matrix(nrow = 4)
 
 raster_layer <- terra::rast(input_data)
@@ -126,7 +125,7 @@ terra::plot(raster_layer)
 
 ---
 
-## File Formats
+## File Formats/Extensions
 
 - Gtiff/GeoTiff
 - JPEG2000
@@ -147,7 +146,6 @@ Again, `raster` is the most commonly used package for raster data in `R`.
 Some newer developments, e.g., as in the `stars` package, also implement an interface to simple features in `sf`.
 
 The `terra` package helps to use more elaborate zonal statistics. The same holds for the `spatstat` package.
-
 
 ---
 
@@ -275,7 +273,7 @@ We can subsetting vector data by simply filtering for specific attribute values.
 .pull-left[
 ```{r deutz}
 deutz <-
-  sf::st_read("./data/cologne.shp") %>% 
+  sf::st_read("./data/cologne.shp") |> 
   dplyr::filter(NAME == "Deutz")
 ```
 ]
@@ -315,7 +313,7 @@ tm_shape(cropped_immigrant_rate) +
 
 ## Masking
 
-Masking is similar to cropping, yet values outside the extent just get set to missing values (`NA`).
+Masking is similar to cropping, yet values outside the extent are set to missing values (`NA`).
 
 --
 
@@ -342,13 +340,13 @@ tm_shape(masked_immigrant_rate) +
 .pull-left[
 ```{r crop-mask-raster}
 cropped_masked_immigrant_rate <-
-  terra::crop(immigrant_rate, deutz) %>% 
-  raster::mask(., terra::vect(deutz))
+  terra::crop(immigrant_rate, deutz) |> 
+  raster::mask(terra::vect(deutz))
 ```
 ]
 
 --
- 
+
 .pull-right[
 ```{r crop-mask-raster-map, echo = FALSE}
 tm_shape(cropped_masked_immigrant_rate) +
@@ -378,11 +376,10 @@ class: middle
 .pull-left[
 ```{r fancy-points}
 fancy_points <-
-  immigrants_cologne %>% 
-  stars::st_as_stars() %>% 
-  sf::st_as_sf() %>% 
-  sf::st_sample(10) %>% 
-  sf::st_as_sf()
+  immigrants_cologne |> 
+  terra::spatSample(size = 10, na.rm = TRUE, as.points = TRUE) |> 
+  sf::st_as_sf() |> 
+  dplyr::select(-1)
 ```
 ]
 
@@ -421,7 +418,7 @@ tm_shape(immigrant_rate) +
 To extract the raster values at a specific point by location we simply use:
 
 ```{r raster-extraction}
-terra::extract(immigrants_cologne, terra::vect(fancy_points), ID = FALSE)
+terra::extract(immigrants_cologne, fancy_points, ID = FALSE)
 ```
 
 ---
@@ -432,10 +429,12 @@ These information can simply be added to an existing dataset (our points in this
 
 ```{r add-results}
 fancy_points <-
-  fancy_points %>% 
+  fancy_points |> 
   dplyr::mutate(
     immigrant_rate_value = 
-      terra::extract(immigrant_rate, terra::vect(.), ID = FALSE, raw = TRUE)
+      as.vector(
+        terra::extract(immigrant_rate, fancy_points, ID = FALSE, raw = TRUE)
+      )
   )
 
 fancy_points
@@ -484,14 +483,12 @@ We can use spatial buffers of different sizes to extract information on surround
 ```{r raster-buffer-extraction}
 terra::extract(
   immigrants_cologne, 
-  fancy_points %>% 
-    sf::st_buffer(500) %>%
-    terra::vect(.),
+  sf::st_buffer(fancy_points, 500),
   fun = mean,
   na.rm = TRUE,
   ID = FALSE,
   raw = TRUE
-  )
+)
 ```
 ]
 
@@ -499,14 +496,12 @@ terra::extract(
 ```{r raster-buffer-extraction-2}
 terra::extract(
   immigrants_cologne, 
-  fancy_points %>% 
-    sf::st_buffer(1000) %>% 
-    terra::vect(), 
+  sf::st_buffer(fancy_points, 1000),
   fun = mean,
   na.rm = TRUE,
   ID = FALSE,
   raw = TRUE
-  )
+)
 ```
 ]
 
@@ -527,8 +522,7 @@ So far, raster data have been unidimensional: we only had one attribute for each
 
 But they can also be stacked:
 ```{r raster-stack}
-census_stack <-
-  c(immigrants_cologne, inhabitants_cologne)
+census_stack <- c(immigrants_cologne, inhabitants_cologne)
 
 census_stack
 ```
@@ -537,7 +531,7 @@ census_stack
 
 ## Non-Regular Grids
 
-In this course, we will only use regular grid-based raster data. But be aware that also non-regular grid data exist.
+In this course, we only use regular grid-based raster data. But be aware that also non-regular grid data exist.
 
 ```{r pic-grid, echo = FALSE, out.width = "70%"}
 woRkshoptools::include_picture("nonregular_grid.png")
@@ -547,7 +541,7 @@ woRkshoptools::include_picture("nonregular_grid.png")
 
 ---
 
-## Relevant in this context: satellite data
+## Relevant in this context: satellite data #WIP
 
 Satellite data have become increasingly popular in social science applications. They can be used, among others, to develop alternative measures for inequality, particularly in the global south. For example, Weidmann & Theunissen (2017) use nighttime light emissions data to construct measures of local inequality.
 
@@ -571,7 +565,7 @@ woRkshoptools::include_picture("cube2.png")
 ## Tomorrow
 
 ```{r course-content-tomorrow, echo = FALSE}
-course_content %>%
+course_content |>
   kableExtra::row_spec(6:10, background = "yellow")
 ```
 
@@ -586,29 +580,24 @@ class: middle
 ## Raster to Points
 
 ```{r raster-to-points}
-raster_points <-
-  immigrant_rate %>% 
-  terra::as.polygons() %>% 
-  terra::centroids() %>% 
-  sf::st_as_sf()
+raster_now_points <-
+  immigrant_rate |> 
+  terra::as.points()
 
-raster_points
+raster_now_points
 ```
 
 
 ---
 
 ## Points to Raster
-In the `terra` (or `raster`) package are functions to convert vector data into raster data, a process called rasterizing. I find these function a bit tricky as they require defining a 'background' raster layer on which the vector data are projected. Thus, I prefer the following method using the `stars` package:
-
 
 ```{r points-to-raster}
-points_raster <-
-  raster_points %>% 
-  stars::st_rasterize(dx = 100, dy = 100) %>% 
-  terra::rast()
+points_now_raster <-
+  raster_now_points |> 
+  terra::rast(vals = raster_now_points$immigrants_cologne, resolution = 100)
 
-points_raster
+points_now_raster
 ```
 
 ---
@@ -618,11 +607,12 @@ points_raster
 .pull-left[
 ```{r simple-densities}
 kernel_densities <- 
-  raster_points %>% 
-  dplyr::filter(immigrants_cologne > 25) %>% 
-  sf::as_Spatial() %>%
-  as("ppp") %>% 
-  spatstat.explore::density.ppp(sigma = 250) %>% 
+  raster_now_points |>  
+  sf::st_as_sf() |> 
+  dplyr::filter(immigrants_cologne > 25) |> 
+  sf::as_Spatial() |> 
+  as("ppp") |> 
+  spatstat.explore::density.ppp(sigma = 250) |>  
   terra::rast()
 
 terra::crs(kernel_densities) <- "epsg:3035"
@@ -643,8 +633,8 @@ tm_shape(kernel_densities) +
 .pull-left[
 ```{r raster-to-polygon}
 polygon_raster <-
-  immigrant_rate %>% 
-  terra::as.polygons() %>% 
+  immigrant_rate |>  
+  terra::as.polygons() |> 
   sf::st_as_sf()
 ```
 ]
@@ -736,8 +726,8 @@ From the [official documentation](http://search.r-project.org/R/library/raster/h
 sobel <- function(r) {
   fy <- matrix(c(1, 0, -1, 2, 0, -2, 1, 0, -1), nrow = 3)
   fx <- matrix(c(-1, -2, -1, 0, 0, 0, 1, 2, 1) , nrow = 3)
-  rx <- focal(r, fx)
-  ry <- focal(r, fy)
+  rx <- terra::focal(r, fx)
+  ry <- terra::focal(r, fy)
   sqrt(rx^2 + ry^2)
 }
 ```
@@ -751,7 +741,7 @@ old_extent <- terra::ext(immigrant_rate)
 new_extent <- old_extent + c(10000, -10000, 10000, -10000)
 
 smaller_immigrant_rate <-
-  immigrant_rate %>% 
+  immigrant_rate |> 
   terra::crop(new_extent)
 
 smaller_immigrant_rate[smaller_immigrant_rate < 15] <- NA
