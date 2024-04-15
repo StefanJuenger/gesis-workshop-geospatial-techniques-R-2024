@@ -360,9 +360,9 @@ tm_shape(cropped_masked_immigrant_rate) +
 class: middle
 ## Exercise 1_4_1: Basic Raster Operations
 
-[Exercise](https://stefanjuenger.github.io/gis_socsci_konstanz/exercises/1_4_1_Basic_Raster_Operations.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_4_1_Basic_Raster_Operations.html)
 
-[Solution](https://stefanjuenger.github.io/gis_socsci_konstanz/solutions/1_4_1_Basic_Raster_Operations.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_4_1_Basic_Raster_Operations.html)
 
 ---
 
@@ -510,9 +510,9 @@ terra::extract(
 class: middle
 ## Exercise 1_4_2: Fancier Raster Operations
 
-[Exercise](https://stefanjuenger.github.io/gis_socsci_konstanz/exercises/1_4_2_Fancier_Raster_Operations.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_4_2_Fancier_Raster_Operations.html)
 
-[Solution](https://stefanjuenger.github.io/gis_socsci_konstanz/solutions/1_4_2_Fancier_Raster_Operations.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_4_2_Fancier_Raster_Operations.html)
 
 ---
 
