@@ -30,12 +30,11 @@ The shapefile is no raster file, so that you would need the `sf::read_sf()` func
 ```{r first, solution = TRUE}
 library(dplyr)
 
-cologne <-
-  sf::read_sf("./data/cologne.shp")
+cologne <- sf::read_sf("./data/cologne.shp")
 
 cologne_50_points <-
-  cologne %>% 
-  sf::st_sample(50) %>% 
+  cologne |>  
+  sf::st_sample(50) |> 
   sf::st_as_sf()
 ```
 
@@ -45,7 +44,7 @@ Create a new raster layer comprising Cologne's immigrant rates based on the rast
 ```
 
 ```{block, opts.label = "clues"}
-You would need the `immigrants_cologne.tif` and `inhabitants_cologne.tif` files in the `./data/` folder.
+You would need the `immigrants_cologne.tif` and `inhabitants_cologne.tif` files in the `./data` folder.
 ```
 
 ```{r second, solution = TRUE}
@@ -65,10 +64,11 @@ Remember that the German Census 2011 data are relatively sparse due to some seve
 ```
 
 ```{r third, solution = TRUE}
-immigrant_rates_at_point <-
-  terra::extract(immigrant_rates, terra::vect(cologne_50_points))
+immigrant_rates_at_point <- terra::extract(immigrant_rates, cologne_50_points)
 
-# There may be a lot of missing values.
+immigrant_rates_at_point
+
+# There are a lot of missing values.
 ```
 
 ```{block, box.title = "4", box.body = list(fill = "white"), box.icon = "fa-star"}
@@ -76,18 +76,18 @@ Use an adequate method of raster extraction to gather information in the geograp
 ```
 
 ```{block, opts.label = "clues"}
-Assume that people move in a 500 meters radius around their location. Thus, extracting information on buffers of 500 meters around the points might be interesting using the option `sf::st_buffer()` function. In that case, you should also set a descriptive statistics function, e.g., with the option `fun = mean` and its helpful companion option to consider missing values `na.rm = TRUE`. 
+Assume that people move in a 1,000 meters radius around their location. Thus, extracting information on buffers of 1,000 meters around the points might be interesting using the option `sf::st_buffer()` function. In that case, you should also set a descriptive statistics function, e.g., with the option `fun = mean` and its helpful companion option to consider missing values `na.rm = TRUE`. 
 ```
 
 ```{r fourth, solution = TRUE}
-immigrant_rates_500m_buffer <-
+immigrant_rates_1000m_buffer <-
   terra::extract(
     immigrant_rates, 
-    cologne_50_points %>% 
-      sf::st_buffer(500) %>% 
-      terra::vect(), 
+    sf::st_buffer(cologne_50_points, 1000), 
     fun = mean,
     na.rm = TRUE
     )
+
+immigrant_rates_1000m_buffer
 ```
 
