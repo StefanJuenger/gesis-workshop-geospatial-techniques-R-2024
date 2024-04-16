@@ -2,7 +2,7 @@
 title: "Introduction to Geospatial Techniques for Social Scientists in R"
 subtitle: "Vector Data"
 author: "Stefan Jünger & Anne-Kathrin Stroppe"
-date: June 06, 2022
+date: April 23, 2024
 institute: |
   GESIS Workshop
 presenter: Anne
@@ -54,11 +54,6 @@ tm_shape(World) +
 .pull-right[
 The surface of the earth is represented by simple geometries and attributes.
 
-What usually comes as vector data:
-- administrative borders 
-- rivers and roads, 
-- buildings, cities, and more
-
 Every object is defined by longitude (x) and latitude (y) values.
 ]
 
@@ -69,7 +64,7 @@ Every object is defined by longitude (x) and latitude (y) values.
 Each real-world feature is one of three types of geometries:
 - Points: discrete location (e.g., city)
 - Lines: linear feature (e.g., river)
-- Polygons: enclosed area  (e.g, country)
+- Polygons: enclosed area  (e.g, country, administrative borders)
 ]
 
 .pull-right[
@@ -84,10 +79,7 @@ woRkshoptools::include_picture("vector_geometries.png")
 
 ## Vector data: Attribute tables
 
-The geometries of vector data hold up to three information:
-- location (points, lines, and polygons)
-- length (lines and polygons)
-- area (polygons)
+Only geometries means that we do not have any other information.
 
 We need to assign attributes to each geometry to hold additional information $\rightarrow$ data tables called attribute tables
 - Each row represents a geometric object, which we can also call observation or case.
@@ -256,11 +248,12 @@ woRkshoptools::include_picture("plot_german_states.png")
 ## Import point layer
 
 Unfortunately, the data we want to visualize or analyze are not always available as shapefiles.
-Especially, point coordinates are often stored in table formats like `.csv` - as are the location of German hospitals in our `./data` folder. 
+Especially, point coordinates are often stored in table formats like `.csv` - as are the location of charging stations for electric cars in our `./data` folder. 
 
-```{r load-hospitals-display}
-hospitals_df <- readr::read_csv("./data/hospital_points.csv")
-head(hospitals_df)
+```{r load-echarging-display}
+echarging_df <- readr::read_delim("./data/charging_points_ger.csv", 
+                                  delim =";")
+head(echarging_df)
 ```
 
 
@@ -268,40 +261,46 @@ head(hospitals_df)
 
 ## From data table to geospatial data
 
-We see that besides our attributes (e.g., year of data collection, number of beds...), the table contains the two variables "X" and "Y", our point coordinates.
+We see that besides our attributes (e.g., operator, power,...), the table contains the two variables "longitude" (X) and "latitude" (Y), our point coordinates.
 When using the command `sf::st_as_sf()`, make sure to use the option `crs = [EPSG_ID]`.
-If not used, your CRS will not be defined, and you won't perform further commands depending on the CRS.
-Good thing that Anne was the one who geocoded the addresses, and we know that the data are most likely stored in `EPSG:3035`.
+If not used, your CRS will not be defined, and you can't perform further commands depending on the CRS.
+Here, I tried [EPSG IO](https://epsg.io) or [http://projfinder.com/](http://projfinder.com/) to find out.
 
 .pull-left[
-```{r plot-hospitals-sf-display, eval = F}
+```{r plot-charging-sf-display, eval = F}
 # transform to spatial data frame
-hospitals_sf <- 
-  sf::st_as_sf(
-    hospitals_df,    
-    coords = c("X", "Y"),
-    crs = 3035
+echarging_sf <- 
+    sf::st_as_sf(
+      echarging_df %>% 
+        # there were some missings in my data that
+        # are not allowed 
+        filter(!is.na(longitude) & !is.na(latitude)),    
+    coords = c("longitude", "latitude"),
+    crs = 4326
   )
 
 # inspect data
-class(hospitals_sf)
-sf::st_geometry(hospitals_sf)
+class(echarging_sf)
+sf::st_geometry(echarging_sf)
 ```
 ]
 
 .pull-right[
-```{r transform-hospitals, echo = F}
+```{r transform-charging, echo = F}
 
 # transform to spatial data frame
-hospitals_sf <- 
+echarging_sf <- 
   sf::st_as_sf(
-    hospitals_df,    
-    coords = c("X", "Y"),
-    crs = 3035
+    echarging_df %>% 
+        # there were some missings in my data that
+        # are not allowed 
+        dplyr::filter(!is.na(longitude) & !is.na(latitude)),    
+    coords = c("longitude", "latitude"),
+    crs = 4326
   )
 # inspect data
-class(hospitals_sf)
-sf::st_geometry(hospitals_sf) 
+class(echarging_sf)
+sf::st_geometry(echarging_sf) 
 ```
 ]
 
@@ -309,8 +308,8 @@ sf::st_geometry(hospitals_sf)
 
 ## Our point data
 
-```{r plot-hospitals, out.width = "55%"}
-plot(hospitals_sf)
+```{r plot-charging, out.width = "55%"}
+plot(echarging_sf)
 ```
 
 ---
@@ -382,7 +381,8 @@ plot(german_districts)
 Since it would be a little bit boring to work with just administrative information, there's an extra table with more attributes called *attributes_districts.csv*.
 
 ```{r load-attr-display}
-attributes_districts <- readr::read_csv("./data/attributes_districts.csv") 
+attributes_districts <- readr::read_delim("./data/attributes_districts.csv", 
+                                  delim =";")
 ```
 
 
@@ -410,78 +410,83 @@ head(german_districts_enhanced, 2)
 
 ---
 
-## Add (More) Attributes: Spatial Join, Spatial Intersects, and More
+## Add (More) Attributes
 
 Besides the regular join, we can also perform a so-called *spatial join*.
-For example, we want to count the number of hospitals in each German district.
+For example, we want to count the number of charging stations in each German district.
 
-```{r spatial-join}
+```{r spatial-join, cache = TRUE}
 
-# perform spatial join to identify for each hospital the correct district id 
-hospitals_in_districts <- 
-  sf::st_join(hospitals_sf, german_districts_enhanced, join = st_within)
+# adjust crs first
+echarging_sf_3035 <-
+  sf::st_transform(echarging_sf, crs=3035)
 
-# count the number of hospitals within a district
-hospital_districts_count <- 
-  dplyr::count(hospitals_in_districts, district_id, name = "hospital_count")
+# perform spatial join to identify for each charger the correct district id 
+charger_in_districts <- 
+  sf::st_join(echarging_sf_3035, german_districts_enhanced, join = st_within)
 
-# Join the hospital count with the German district a
+# count the number of charger within a district
+charger_districts_count <- 
+  dplyr::count(charger_in_districts, district_id, name = "charger_count")
+
+# Join the charger count with the German district attributes
 german_districts_enhanced <- 
   dplyr::left_join(
     german_districts_enhanced, 
-    hospital_districts_count %>% sf::st_drop_geometry(), 
+    charger_districts_count %>% sf::st_drop_geometry(), 
     by = "district_id"
   ) %>% 
-  dplyr::mutate(hospital_count = tidyr::replace_na(hospital_count, 0))
+  # assumption that their simply is no charger in some districts
+  dplyr::mutate(charger_count = tidyr::replace_na(charger_count, 0))
 ```
 
 ---
 
 ## Subsetting the Data
 
-One might be interested in only one specific area of Germany, like the capital Berlin.
+One might be interested in only one specific area of Germany, like Cologne.
 To subset a `sf` object,  you often can use your usual data wrangling workflow. 
 In this case, I know the district_id and that is also the only information I want to keep.
 
 .pull-left[
 ```{r stouches-display, eval = F}
-berlin <-
+cologne <-
   german_districts_enhanced %>% 
-  dplyr::filter(district_id == 11000) %>% 
+  dplyr::filter(district_id == "05315") %>% 
   dplyr::select(district_id) 
 
-plot(berlin)
+plot(cologne)
 ```
 ]
 
 .pull-right[
 ```{r stouches, echo = F}
 # subsetting
-berlin <-
+cologne <-
   german_districts_enhanced %>% 
-  filter(district_id == 11000) %>% 
+  filter(district_id == "05315") %>% 
   dplyr::select(district_id) 
 
-plot(berlin)
+plot(cologne)
 ```
 ]
 ---
 
 ## Using `sf` for subsetting
 
-If you have no information about *ids* but only about the geolocation, you can use `sf::st_touches()` (or `st_touches()`, `st_within()`, `st_intersect()`, `st_crosses()`...) to identify for example all districts which share a border with Berlin.
+If you have no information about *ids* but only about the geolocation, you can use `sf::st_touches()` (or `st_touches()`, `st_within()`, `st_intersect()`, `st_crosses()`...) to identify for example all districts which share a border with Cologne.
 
 .pull-left[
 ```{r surround-display, eval = F}
-berlin_surrounding <-
+cologne_surrounding <-
   german_districts_enhanced %>% 
   dplyr::select(district_id) %>% 
   # length of mutual border > 0
   dplyr::filter(
-    lengths(sf::st_touches(., berlin)) > 0
+    lengths(sf::st_touches(., cologne)) > 0
   ) 
 
-plot(berlin_surrounding)
+plot(cologne_surrounding)
 ```
 ]
 
@@ -489,15 +494,15 @@ plot(berlin_surrounding)
 
 .pull-right[
 ```{r surround, echo= F}
-berlin_surrounding <-
+cologne_surrounding <-
   german_districts_enhanced %>% 
   dplyr::select(district_id) %>% 
   # length of mutual border > 0
   dplyr::filter(
-    lengths(sf::st_touches(., berlin)) > 0
+    lengths(sf::st_touches(., cologne)) > 0
   ) 
 
-plot(berlin_surrounding)
+plot(cologne_surrounding)
 ```
 ]
 
@@ -536,7 +541,7 @@ readr::write_csv(
 
 # Export data frame as csv with geometric attributes
 sf::st_write(
-  hospitals_sf, "./participant_materials/hospitals_epsg3035.csv", 
+  echarging_sf_3035, "./participant_materials/echarging_epsg3035.csv", 
   layer_options = "GEOMETRY=AS_XY"
 )
 ```
@@ -566,38 +571,38 @@ The next step is producing an awesome map! `r emo::ji("confetti")`
 ]
 
 .pull-right[
-```{r cologne-covid, echo=F}
+```{r cologne-ecars, echo=F}
 
 # Import data
 german_districts <- 
   sf::read_sf("./data/VG250_KRS.shp") %>% 
   dplyr::rename(district_id = AGS)
 
-attributes_districts <- readr::read_csv("./data/attributes_districts.csv") 
+attributes_districts <- readr::read_delim("./data/attributes_districts.csv",
+                                          delim = ";") 
 
 # Join data and transform
 german_districts_enhanced <- 
   german_districts %>% 
   sf::st_transform(3035) %>% 
-  dplyr::left_join(attributes_districts, by = "district_id") %>% 
-  dplyr::mutate(covid_deaths_pop = (death_rate / population) * 100000)
+  dplyr::left_join(attributes_districts, by = "district_id") 
 
 
-# filter Mannheim
-mannheim <-
+# filter Cologne
+cologne <-
   german_districts_enhanced %>% 
-  dplyr::filter(district_id == "08222")
+  dplyr::filter(district_id == "05315")
 
 
 # filter surrounding districts, append with Mannheim data and select the Covid column
-mannheim_sur <-
+cologne_sur <-
   german_districts_enhanced %>%
-  dplyr::filter(lengths(sf::st_touches(., mannheim)) > 0) %>% 
-  dplyr::bind_rows(mannheim) %>%   
-  dplyr::select(covid_deaths_pop)
+  dplyr::filter(lengths(sf::st_touches(., cologne)) > 0) %>% 
+  dplyr::bind_rows(cologne) %>%   
+  dplyr::select(ecar_share)
 
 # plot  
-plot(mannheim_sur)
+plot(cologne_sur)
 ```
 ]
 

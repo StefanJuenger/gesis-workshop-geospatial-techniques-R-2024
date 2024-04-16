@@ -9,7 +9,7 @@ presenter: Stefan
 --- 
 layout: true
 
-```{r child = "./content/config/sessions_setup.Rmd"}
+```{r child = "./config/sessions_setup.Rmd"}
 ```
 
 ---
@@ -102,18 +102,29 @@ woRkshoptools::include_picture("Stefan.png")
 
 ## About Us
 
-**Anne-Kathrin Stroppe**
+**Anne Stroppe**
 
-- Doctoral researcher in the team National Surveys at the GESIS Data Archive
-- Data Curator for the German Longitudinal Election Study
-- Research focuses on political and electoral geography
-- (other) research interests:
-  - determinants of electoral behavior
-  - infrastructural inequalities & political alienation
-  - quantitative methods of the social sciences
+.pull-left[
+```{r Anne-pic, echo = FALSE, out.width = "50%"}
+woRkshoptools::include_picture("Anne.png")
+```
+]
 
-[anne-kathrin.stroppe@gesis.org](mailto:anne-kathrin.stroppe@gesis.org) |
-[@AStroppe](https://twitter.com/AStroppe)
+.pull-right[
+- Research Associate in the SDA team at GESIS
+- Pursuing Ph.D. at the University of Mannheim (PolSci)
+]
+
+
+- Research focuses:
+  - Political and electoral geography
+  - Attitudes towards the political system
+  - Political engagement and conspiracy beliefs
+  - Data quality and open science
+   
+.small[
+[anne-kathrin.stroppe@gesis.org](mailto:anne-kathrin.stroppe@gesis.org) 
+]
 
 ---
 
