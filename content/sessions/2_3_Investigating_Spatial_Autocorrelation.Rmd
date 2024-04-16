@@ -2,9 +2,8 @@
 title: "Introduction to Geospatial Techniques for Social Scientists in R"
 subtitle: "Investigating Spatial Autocorrelation"
 author: "Stefan Jünger & Anne-Kathrin Stroppe"
-date: June 07, 2022
-institute: |
-  GESIS Workshop
+date: April 24, 2024
+institute: GESIS Workshop
 presenter: Stefan
 editor_options: 
   chunk_output_type: console
