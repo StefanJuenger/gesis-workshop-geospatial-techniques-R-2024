@@ -19,7 +19,7 @@ layout: true
 ## Now
 
 ```{r course-content-now, echo = FALSE}
-course_content %>%
+course_content |>
   kableExtra::row_spec(9, background = "yellow")
 ```
 
@@ -138,8 +138,8 @@ Say, we are interested in AfD voting outcomes in relation to ethnic compositions
 
 ```{r load-voting-districts}
 voting_districts <-
-  sf::st_read("./data/Stimmbezirk.shp") %>% 
-  sf::st_transform(3035) %>% 
+  sf::st_read("./data/Stimmbezirk.shp") |> 
+  sf::st_transform(3035) |> 
   dplyr::transmute(Stimmbezirk = as.numeric(nummer))
 
 head(voting_districts, 2)
@@ -154,8 +154,8 @@ afd_votes <-
   glue::glue(
     "https://www.stadt-koeln.de/wahlen/bundestagswahl/09-2021/praesentation/\\
     Open-Data-Bundestagswahl476.csv"
-  ) %>% 
-  readr::read_csv2() %>%
+  ) |> 
+  readr::read_csv2() |>
   dplyr::transmute(Stimmbezirk = `gebiet-nr`, afd_share = (F1 / F) * 100)
 
 head(afd_votes, 2)
@@ -208,15 +208,15 @@ tm_shape(election_results) +
 
 ```{r load-census-data}
 immigrants_cologne <-
-  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) %>%
-  terra::crop(election_results) %>%
-  terra::mask(terra::vect(election_results))
+  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) |>
+  terra::crop(election_results) |>
+  terra::mask(election_results)
 
 
 inhabitants_cologne <-
-  z11::z11_get_100m_attribute(Einwohner) %>%
-  terra::crop(election_results) %>%
-  terra::mask(terra::vect(election_results))
+  z11::z11_get_100m_attribute(Einwohner) |>
+  terra::crop(election_results) |>
+  terra::mask(election_results)
 
 immigrant_share_cologne <-
   (immigrants_cologne / inhabitants_cologne) * 100
@@ -259,15 +259,15 @@ As the voting (vector) data is different to the Census raster data we cannot use
 
 ```{r exact-extract, message = FALSE}
 election_results <-
-  election_results %>%
+  election_results |>
   dplyr::mutate(
     immigrant_share = 
       exactextractr::exact_extract(
-        immigrant_share_cologne, ., 'mean', progress = FALSE
+        immigrant_share_cologne, election_results, 'mean', progress = FALSE
       ),
     inhabitants = 
       exactextractr::exact_extract(
-        inhabitants_cologne, ., 'mean', progress = FALSE
+        inhabitants_cologne, election_results, 'mean', progress = FALSE
       )
   )
 
@@ -338,11 +338,11 @@ summary(queens_neighborhoods)
 
 .pull-left[
 ```{r connected-regions, eval = F}
-queens_neighborhoods %>%
+queens_neighborhoods |>
   spdep::nb2lines(
     coords = sf::st_as_sfc(election_results), 
     as_sf = TRUE
-  ) %>%
+  ) |>
   tm_shape() +
   tm_dots() +
   tm_lines()
@@ -352,11 +352,11 @@ queens_neighborhoods %>%
 .pull-right[
 .center[
 ```{r connected-regions-show, echo = F}
-queens_neighborhoods %>%
+queens_neighborhoods |>
   spdep::nb2lines(
     coords = sf::st_as_sfc(election_results), 
     as_sf = TRUE
-  ) %>%
+  ) |>
   tm_shape() +
   tm_dots() +
   tm_lines()
@@ -387,7 +387,7 @@ non-normalized
 ```{r non-normalized, echo = FALSE}
 spdep::nb2mat(queens_neighborhoods, style = "B")[1:5, 1:5]
 
-rowSums(spdep::nb2mat(queens_neighborhoods, style = "B")[1:5, 1:5]) %>% as.vector()
+rowSums(spdep::nb2mat(queens_neighborhoods, style = "B")[1:5, 1:5]) |> as.vector()
 ```
 ]
 
@@ -396,7 +396,7 @@ normalized
 ```{r normalized, echo = FALSE}
 spdep::nb2mat(queens_neighborhoods, style = "W")[1:5, 1:5]
 
-rowSums(spdep::nb2mat(queens_neighborhoods, style = "W")[1:5, 1:5]) %>% as.vector()
+rowSums(spdep::nb2mat(queens_neighborhoods, style = "W")[1:5, 1:5]) |> as.vector()
 ```
 ]
 
@@ -477,9 +477,9 @@ The [`sfdep`](https://cran.r-project.org/web/packages/sfdep/index.html) package 
 
 ```{r sfdep-example}
 election_results <-
-  election_results %>% 
+  election_results |> 
   dplyr::mutate(
-    neighbors = sfdep::st_contiguity(.), # queen neighborhoods by default
+    neighbors = sfdep::st_contiguity(election_results), # queen neighborhoods by default
     weights = sfdep::st_weights(neighbors)
   )
 
@@ -511,9 +511,9 @@ election_results %$%
 class: middle 
 ## Exercise 2_3_1: Neighborhood Matrices
 
-[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/exercises/2_3_1_Neighborhood_Matrices.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/2_3_1_Neighborhood_Matrices.html)
 
-[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/solutions/2_3_1_Neighborhood_Matrices.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/2_3_1_Neighborhood_Matrices.html)
 
 ---
 
@@ -529,10 +529,10 @@ $$I_i=\frac{x_i-\bar{x}}{\frac{\sum_{i-1}^N(x_i-\bar{x})^2}{N}}\sum_{j=1}^Nw_{ij
 
 ```{r lisa}
 lisa <- 
-  election_results %>% 
+  election_results |> 
   dplyr::mutate(
     lisa = sfdep::local_moran(afd_share, neighbors, weights)
-  ) %>% 
+  ) |> 
   tidyr::unnest()
 
 head(lisa, 2)
@@ -563,7 +563,7 @@ tm_shape(lisa) +
 .pull-left[
 ```{r lisa-map-bi, eval = F}
 lisa_bivariate <- 
-  election_results %>% 
+  election_results |> 
   dplyr::mutate(
     lisa = sfdep::local_moran_bv(
       afd_share, 
@@ -571,7 +571,7 @@ lisa_bivariate <-
       neighbors, 
       weights
       )
-  ) %>% 
+  ) |> 
   tidyr::unnest()
 
 tm_shape(lisa_bivariate) +
@@ -587,7 +587,7 @@ tm_shape(lisa_bivariate) +
 .center[
 ```{r lisa-map-bi-2, echo = F}
 lisa_bivariate <- 
-  election_results %>% 
+  election_results |> 
   dplyr::mutate(
     lisa = sfdep::local_moran_bv(
       afd_share, 
@@ -595,7 +595,7 @@ lisa_bivariate <-
       neighbors, 
       weights
       )
-  ) %>% 
+  ) |> 
   tidyr::unnest()
 
 tm_shape(lisa_bivariate) +
