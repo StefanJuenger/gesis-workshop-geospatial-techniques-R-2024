@@ -31,7 +31,7 @@ You can use the `sample()` function to create the numbers.
 library(dplyr)
 
 fancy_matrix <-
-  sample(1:1000, 8*8, replace = TRUE) %>% 
+  sample(1:1000, 8*8, replace = TRUE) |> 
   matrix(nrow = 8, ncol = 8)
 
 fancy_matrix
@@ -49,8 +49,7 @@ The `terra::rast()` function can be fed with matrices to create a raster layer.
 ```{r second, solution = TRUE}
 library(terra)
 
-fancy_raster_layer <-
-  terra::rast(fancy_matrix)
+fancy_raster_layer <- terra::rast(fancy_matrix)
 
 terra::plot(fancy_raster_layer)
 ```
@@ -66,17 +65,16 @@ Make sure your file paths are set correctly. You can check them with `getwd()`. 
 ```
 
 ```{r third, solution = TRUE}
-immigrants_cologne <-
-  terra::rast("./data/immigrants_cologne.tif")
+immigrants_cologne <- terra::rast("./data/immigrants_cologne.tif")
 ```
 
 
 ```{block, box.title = "4", box.body = list(fill = "white"), box.icon = "fa-star"}
-Import the data on Immigrants, Germans, and Inhabitants. Add up the Immigrants and Germans to a new layer. Then subtract this new layer from the Inhabitants layer to check whether the inhabitant layer is the same as the sum of immigrants and Germans. Is it?
+Import the data on immigrants and inhabitants. Create a new layer showing the proportion of immigrants in each grid cell between 0 and 1. Next, apply z-standardization and dichotomize the data to get information about which grid cells deviate from the overall mean. Plot both "versions" of the data to see how they compare.
 ```
 
 ```{block, opts.label = "clues"}
-You can handle raster layers as any simple data table using `+` and `-` operators.
+You can handle raster layers as any simple data table using `+`, `-`, or `/` operators. Z-standardization can be applied using the `terra::scale()` function.
 ```
 
 ```{r fourth, solution = TRUE}
@@ -84,27 +82,23 @@ You can handle raster layers as any simple data table using `+` and `-` operator
 immigrants_cologne <-
   terra::rast("./data/immigrants_cologne.tif")
 
-germans_cologne <-
-  terra::rast("./data/germans_cologne.tif")
-
 inhabitants_cologne <-
   terra::rast("./data/inhabitants_cologne.tif")
 
-# create sum layer
-immigrants_germans_sum <-
-  immigrants_cologne + germans_cologne
+# create proportation layer
+immigrants_proportion <- immigrants_cologne / inhabitants_cologne
 
-# create difference layer
-difference_layer <-
-  inhabitants_cologne - immigrants_germans_sum
+# scale data
+immigrants_proportion_scaled <- terra::scale(immigrants_proportation)
 
-difference_layer
+immigrants_proportion_scaled[immigrants_proportion_scaled < 0] <- 0
+immigrants_proportion_scaled[immigrants_proportion_scaled > 0] <- 1
 
-# get a summary statistic
-summary(difference_layer)
+library(tmap)
 
-# create a table of counts
-difference_layer %>% 
-  as.data.frame() %>% 
-  table()
+tm_shape(immigrants_proportion) +
+  tm_raster(palette = "-viridis")
+
+tm_shape(immigrants_proportion_scaled) +
+  tm_raster(palette = "-viridis")
 ```
