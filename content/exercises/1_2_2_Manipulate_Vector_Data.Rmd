@@ -39,10 +39,12 @@ library(dplyr)
 # Import data
 german_districts <- 
   sf::read_sf("./data/VG250_KRS.shp") %>% 
-  dplyr::rename(district_id = AGS) %>% 
-  sf::st_transform(3035)
+  dplyr::mutate(district_id = as.numeric(AGS)) %>% 
+  sf::st_transform(3035) %>% 
+  dplyr::select(district_id,GEN)
 
-attributes_districts <- readr::read_csv("./data/attributes_districts.csv") 
+attributes_districts <- readr::read_delim("./data/attributes_districts.csv",
+                                          delim = ";") 
 
 # Join data and transform
 german_districts_enhanced <- 
@@ -56,20 +58,33 @@ head(german_districts_enhanced, 2)
 ```
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-We want a first descriptive visual of the distribution of charging stations in Cologne and the surrounding districts. 
-Use the number of charger per district (`charger_count`) and the number of charger per 1,000 inhabitant in each district (`charger_dens`). 
+We want a first descriptive visual of the distribution of charging stations in Cologne (or any other district of your choice) and the surrounding districts. 
+Filter the district of Cologne (`district_id == "05315"`) and find the surrounding districts.
+Calculate the number of charger per district (`charger_count`) and the number of charger per 1,000 inhabitant in each district (`charger_dens`). 
 
-Filter the district of Cologne (`district_id == "05315"`), find the surrounding districts, and plot the two columns for Cologne and its surrounding districts.
+Plot the two columns for Cologne and its surrounding districts.
 ```
 
 ```{block, opts.label = "clues"}
 You can use the dplyr function `sf::bind_rows()` to combine the two spatial objects, "Cologne" and "Cologne Surroundings".
 ```
 
-```{r second-exercise, solution = TRUE}
+```{r second-exercise, solution = TRUE, cache = TRUE}
+
+# filter Cologne
+cologne <-
+  german_districts %>% 
+  dplyr::filter(district_id == 5315)
+
+# filter surrounding districts, append with Cologne data and select the charger column
+cologne_sur <-
+  german_districts %>%
+  dplyr::filter(lengths(sf::st_touches(., cologne)) > 0) %>% 
+  dplyr::bind_rows(cologne) 
+
 
 # one pipe to rule them all
-german_districts_enhanced  <-
+cologne_sur_enhanced  <-
   readr::read_delim("./data/charging_points_ger.csv", 
                                   delim =";") %>% 
    filter(!is.na(longitude) & !is.na(latitude)) %>% 
@@ -79,27 +94,18 @@ german_districts_enhanced  <-
     crs = 4326
   ) %>% 
   sf::st_transform(. , crs = 3035) %>% 
-  sf::st_join(., german_districts, join = st_within) %>% 
+  sf::st_join(., cologne_sur, join = st_within) %>% 
   dplyr::group_by(district_id) %>%
   dplyr::summarise(charger_count = n()) %>% 
-  dplyr::mutate(charger_dens = (charger_count*1000) / population) %>%
   sf::st_drop_geometry() %>% 
-  left_join(german_districts_enhanced, ., by = "district_id")
-
-# filter Cologne
-cologne <-
-  german_districts_enhanced %>% 
-  dplyr::filter(district_id == "05315")
-
-# filter surrounding districts, append with Cologne data and select the charger column
-cologne_sur_charger <-
-  german_districts_enhanced %>%
-  dplyr::filter(lengths(sf::st_touches(., cologne)) > 0) %>% 
-  dplyr::bind_rows(cologne) %>%   
-  dplyr::select(charger_count, charger_dens)
+  left_join(cologne_sur, ., by = "district_id") %>% 
+  left_join(., attributes_districts %>% dplyr::select(district_id, population), by = "district_id") %>% 
+  dplyr::mutate(charger_dens = (charger_count*1000) / population)
 
 # plot  
-plot(cologne_sur_charger)
+cologne_sur_enhanced %>% 
+  dplyr::select(charger_count, charger_dens) %>% 
+  plot(.)
 
 ```
 
@@ -110,7 +116,7 @@ Save your data set of Cologne and its surrounding districts as an ESRI Shapefile
 ```{r third-exercise, solution = TRUE, eval = FALSE}
 # Export as shapefile
 sf::st_write(
-  cologne_sur_charger, 
+  cologne_sur_enhanced, 
   dsn = "./data/participant_materials/cologne_charger_epsg3035.shp", 
   delete_layer = TRUE
 )

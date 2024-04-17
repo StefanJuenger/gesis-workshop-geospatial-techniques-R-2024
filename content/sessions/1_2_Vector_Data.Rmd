@@ -262,9 +262,8 @@ head(echarging_df)
 ## From data table to geospatial data
 
 We see that besides our attributes (e.g., operator, power,...), the table contains the two variables "longitude" (X) and "latitude" (Y), our point coordinates.
-When using the command `sf::st_as_sf()`, make sure to use the option `crs = [EPSG_ID]`.
-If not used, your CRS will not be defined, and you can't perform further commands depending on the CRS.
-Here, I tried [EPSG IO](https://epsg.io) or [http://projfinder.com/](http://projfinder.com/) to find out.
+When using the command `sf::st_as_sf()`, it is easy to transform the table into a point layer.
+
 
 .pull-left[
 ```{r plot-charging-sf-display, eval = F}
@@ -275,8 +274,7 @@ echarging_sf <-
         # there were some missings in my data that
         # are not allowed 
         filter(!is.na(longitude) & !is.na(latitude)),    
-    coords = c("longitude", "latitude"),
-    crs = 4326
+    coords = c("longitude", "latitude")
   )
 
 # inspect data
@@ -295,8 +293,7 @@ echarging_sf <-
         # there were some missings in my data that
         # are not allowed 
         dplyr::filter(!is.na(longitude) & !is.na(latitude)),    
-    coords = c("longitude", "latitude"),
-    crs = 4326
+    coords = c( "longitude", "latitude")
   )
 # inspect data
 class(echarging_sf)
@@ -311,6 +308,50 @@ sf::st_geometry(echarging_sf)
 ```{r plot-charging, out.width = "55%"}
 plot(echarging_sf)
 ```
+
+---
+
+## Once again: Check the CRS!
+
+Make sure to use the option `crs = [EPSG_ID]`.
+If not used, your CRS will not be defined, and you can't perform further commands depending on the CRS.
+Here, I tried [EPSG IO](https://epsg.io) or [http://projfinder.com/](http://projfinder.com/) to find out.
+
+.pull-left[
+```{r plot-charging-sf-display-crs, eval = F}
+# transform to spatial data frame
+echarging_sf <- 
+    sf::st_as_sf(
+      echarging_df %>% 
+        # there were some missings in my data that
+        # are not allowed 
+        dplyr::filter(!is.na(longitude) & !is.na(latitude)),    
+    coords = c("longitude","latitude"),
+    crs = 4326
+  )
+
+```
+]
+
+.pull-right[
+```{r plot-charging-crs, echo = F}
+
+echarging_sf <- 
+    sf::st_as_sf(
+      echarging_df %>% 
+        # there were some missings in my data that
+        # are not allowed 
+        dplyr::filter(!is.na(longitude) & !is.na(latitude)),    
+    coords = c("longitude", "latitude"),
+    crs = 4326
+  )
+
+plot(echarging_sf)
+
+```
+]
+
+
 
 ---
 
@@ -332,13 +373,13 @@ sf::st_drop_geometry(german_states) %>%
 class: middle
 ## Exercise 1_2_1: Import Vector Data 
 
-[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/exercises/1_2_1_Import_Vector_Data.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_2_1_Import_Vector_Data.html)
 
-[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/solutions/1_2_1_Import_Vector_Data.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_2_1_Import_Vector_Data.html)
 
 ---
 
-## Data wrangling
+## Data Wrangling
 
 After importing the data sets, we are now ready to manipulate our data. 
 We are working here with the `dplyr` package to manipulate the data frames for all regular data wrangling tasks.
@@ -401,7 +442,7 @@ This is a good example how easily `sf` objects can be handled.
 ```{r join-attrtable}
 german_districts_enhanced <- 
   german_districts %>% 
-  dplyr::rename(district_id = AGS) %>% 
+  dplyr::mutate(district_id = as.numeric(AGS)) %>% 
   dplyr::select(district_id) %>% 
   dplyr::left_join(attributes_districts, by = "district_id")  
 
@@ -442,6 +483,30 @@ german_districts_enhanced <-
 
 ---
 
+## Charger Count per District
+
+```{r charger-count-plot, echo=F}
+
+  tmap::tm_shape(german_districts_enhanced) +
+  tmap::tm_polygons("charger_count",
+              title = "Charger Count (Quantiles)",
+              palette = "viridis",
+              n = 10,
+              style = "quantile",
+              border.alpha = 0) +
+  tmap::tm_shape(german_districts) +
+  tmap::tm_polygons("AGS",
+              alpha = 0,
+              border.col = "lightgrey",
+              legend.show = F) +
+  tmap::tm_layout(legend.title.size = .8,
+            legend.outside =  T, 
+            frame = F)
+
+```
+
+
+---
 ## Subsetting the Data
 
 One might be interested in only one specific area of Germany, like Cologne.
@@ -452,7 +517,7 @@ In this case, I know the district_id and that is also the only information I wan
 ```{r stouches-display, eval = F}
 cologne <-
   german_districts_enhanced %>% 
-  dplyr::filter(district_id == "05315") %>% 
+  dplyr::filter(district_id == 5315) %>% 
   dplyr::select(district_id) 
 
 plot(cologne)
@@ -464,7 +529,7 @@ plot(cologne)
 # subsetting
 cologne <-
   german_districts_enhanced %>% 
-  filter(district_id == "05315") %>% 
+  filter(district_id == 5315) %>% 
   dplyr::select(district_id) 
 
 plot(cologne)
@@ -551,9 +616,9 @@ sf::st_write(
 class: middle
 ## Exercise 1_2_2: Manipulate Vector Data 
 
-[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/exercises/1_2_2_Manipulate_Vector_Data.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_2_2_Manipulate_Vector_Data.html)
 
-[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/solutions/1_2_2_Manipulate_Vector_Data.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_2_2_Manipulate_Vector_Data.html)
 
 ---
 
@@ -576,7 +641,7 @@ The next step is producing an awesome map! `r emo::ji("confetti")`
 # Import data
 german_districts <- 
   sf::read_sf("./data/VG250_KRS.shp") %>% 
-  dplyr::rename(district_id = AGS)
+  dplyr::mutate(district_id = as.numeric(AGS))
 
 attributes_districts <- readr::read_delim("./data/attributes_districts.csv",
                                           delim = ";") 
@@ -591,7 +656,7 @@ german_districts_enhanced <-
 # filter Cologne
 cologne <-
   german_districts_enhanced %>% 
-  dplyr::filter(district_id == "05315")
+  dplyr::filter(district_id == 5315)
 
 
 # filter surrounding districts, append with Mannheim data and select the Covid column
