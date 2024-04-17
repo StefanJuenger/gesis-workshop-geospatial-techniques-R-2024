@@ -25,29 +25,16 @@ Alright, thus far, we have only used Queen neighborhood matrices with our data. 
 
 ```{r compile-data, echo = FALSE}
 voting_districts <-
-  glue::glue(
-    "https://geoportal.stadt-koeln.de/arcgis/rest/services/Basiskarten/kgg/\\
-    MapServer/20/query?where=objectid+is+not+null&text=&objectIds=&time=&\\
-    geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=\\
-    esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&\\
-    outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=\\
-    &geometryPrecision=&outSR=4326&havingClause=&returnIdsOnly=false&return\\
-    CountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=\\
-    &returnZ=false&returnM=false&gdbVersion=&historicMoment=&returnDistinct\\
-    Values=false&resultOffset=&resultRecordCount=&returnExtentOnly=false&datum\\
-    Transformation=&parameterValues=&rangeValues=&quantizationParameters=&\\
-    featureEncoding=esriDefault&f=geojson"
-  ) %>% 
-  sf::st_read(as_tibble = TRUE) %>%
-  sf::st_transform(3035) %>% 
-  dplyr::transmute(Stimmbezirk = as.numeric(nummer))
+  sf::st_read("./data/Stimmbezirk.shp") |> 
+  dplyr::transmute(Stimmbezirk = as.numeric(nummer)) |> 
+  sf::st_transform(3035)
 
 afd_votes <-
   glue::glue(
     "https://www.stadt-koeln.de/wahlen/bundestagswahl/09-2021/praesentation/\\
     Open-Data-Bundestagswahl476.csv"
-  ) %>% 
-  readr::read_csv2() %>%
+  ) |> 
+  readr::read_csv2() |> 
   dplyr::transmute(Stimmbezirk = `gebiet-nr`, afd_share = (F1 / F) * 100)
 
 election_results <-
@@ -58,54 +45,45 @@ election_results <-
   )
 
 immigrants_cologne <-
-  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) %>%
-  terra::crop(election_results) %>%
-  terra::mask(terra::vect(election_results))
+  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) |> 
+  terra::crop(election_results) |> 
+  terra::mask(election_results)
 
 
 inhabitants_cologne <-
-  z11::z11_get_100m_attribute(Einwohner) %>%
-  terra::crop(election_results) %>%
-  terra::mask(terra::vect(election_results))
+  z11::z11_get_100m_attribute(Einwohner) |> 
+  terra::crop(election_results) |> 
+  terra::mask(election_results)
 
 immigrant_share_cologne <-
   (immigrants_cologne / inhabitants_cologne) * 100
 
 election_results <-
-  election_results %>%
+  election_results |> 
   dplyr::mutate(
     immigrant_share = 
-      exactextractr::exact_extract(immigrant_share_cologne, ., 'mean', progress = FALSE),
+      exactextractr::exact_extract(
+        immigrant_share_cologne, election_results, 'mean', progress = FALSE
+        ),
     inhabitants = 
-      exactextractr::exact_extract(inhabitants_cologne, ., 'mean', progress = FALSE)
+      exactextractr::exact_extract(
+        inhabitants_cologne, election_results, 'mean', progress = FALSE
+        )
   )
 ```
 
 ```{r compile-data-show, eval = FALSE}
 voting_districts <-
-  glue::glue(
-    "https://geoportal.stadt-koeln.de/arcgis/rest/services/Basiskarten/kgg/\\
-    MapServer/20/query?where=objectid+is+not+null&text=&objectIds=&time=&\\
-    geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=\\
-    esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&\\
-    outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=\\
-    &geometryPrecision=&outSR=4326&havingClause=&returnIdsOnly=false&return\\
-    CountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=\\
-    &returnZ=false&returnM=false&gdbVersion=&historicMoment=&returnDistinct\\
-    Values=false&resultOffset=&resultRecordCount=&returnExtentOnly=false&datum\\
-    Transformation=&parameterValues=&rangeValues=&quantizationParameters=&\\
-    featureEncoding=esriDefault&f=geojson"
-  ) %>% 
-  sf::st_read(as_tibble = TRUE) %>%
-  sf::st_transform(3035) %>% 
-  dplyr::transmute(Stimmbezirk = as.numeric(nummer))
+  sf::st_read("./data/Stimmbezirk.shp") |> 
+  dplyr::transmute(Stimmbezirk = as.numeric(nummer)) |> 
+  sf::st_transform(3035)
 
 afd_votes <-
   glue::glue(
     "https://www.stadt-koeln.de/wahlen/bundestagswahl/09-2021/praesentation/\\
     Open-Data-Bundestagswahl476.csv"
-  ) %>% 
-  readr::read_csv2() %>%
+  ) |> 
+  readr::read_csv2() |> 
   dplyr::transmute(Stimmbezirk = `gebiet-nr`, afd_share = (F1 / F) * 100)
 
 election_results <-
@@ -116,26 +94,30 @@ election_results <-
   )
 
 immigrants_cologne <-
-  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) %>%
-  terra::crop(election_results) %>%
-  terra::mask(terra::vect(election_results))
+  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) |> 
+  terra::crop(election_results) |> 
+  terra::mask(election_results)
 
 
 inhabitants_cologne <-
-  z11::z11_get_100m_attribute(Einwohner) %>%
-  terra::crop(election_results) %>%
-  terra::mask(terra::vect(election_results))
+  z11::z11_get_100m_attribute(Einwohner) |> 
+  terra::crop(election_results) |> 
+  terra::mask(election_results)
 
 immigrant_share_cologne <-
   (immigrants_cologne / inhabitants_cologne) * 100
 
 election_results <-
-  election_results %>%
+  election_results |> 
   dplyr::mutate(
     immigrant_share = 
-      exactextractr::exact_extract(immigrant_share_cologne, ., 'mean', progress = FALSE),
+      exactextractr::exact_extract(
+        immigrant_share_cologne, election_results, 'mean', progress = FALSE
+        ),
     inhabitants = 
-      exactextractr::exact_extract(inhabitants_cologne, ., 'mean', progress = FALSE)
+      exactextractr::exact_extract(
+        inhabitants_cologne, election_results, 'mean', progress = FALSE
+        )
   )
 ```
 
@@ -167,11 +149,11 @@ rook_W <- spdep::nb2listw(rook_neighborhood, style = "W")
 
 # sfdep
 election_results <-
-  election_results %>% 
+  election_results |> 
   dplyr::mutate(
-    queen_neighborhood = sfdep::st_contiguity(., queen = TRUE),
+    queen_neighborhood = sfdep::st_contiguity(election_results, queen = TRUE),
     queen_W = sfdep::st_weights(queen_neighborhood),
-    rook_neighborhood = sfdep::st_contiguity(., queen = FALSE),
+    rook_neighborhood = sfdep::st_contiguity(election_results, queen = FALSE),
     rook_W = sfdep::st_weights(rook_neighborhood)
   )
 ```
@@ -206,9 +188,9 @@ distance_neighborhood_5000_W <-
 
 # sfdep
 election_results_centroids <-
-  election_results_centroids %>% 
+  election_results_centroids |> 
   dplyr::mutate(
-    neighbors_5000 = sfdep::st_dist_band(., 0, 5000),
+    neighbors_5000 = sfdep::st_dist_band(election_results_centroids, 0, 5000),
     weights_5000 = sfdep::st_weights(neighbors_5000)
   )
 ```
