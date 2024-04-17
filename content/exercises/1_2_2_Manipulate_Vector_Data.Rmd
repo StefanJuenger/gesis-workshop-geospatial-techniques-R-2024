@@ -39,15 +39,15 @@ library(dplyr)
 # Import data
 german_districts <- 
   sf::read_sf("./data/VG250_KRS.shp") %>% 
-  dplyr::rename(district_id = AGS)
+  dplyr::rename(district_id = AGS) %>% 
+  sf::st_transform(3035)
 
 attributes_districts <- readr::read_csv("./data/attributes_districts.csv") 
 
 # Join data and transform
 german_districts_enhanced <- 
   german_districts %>% 
-  dplyr::left_join(attributes_districts, by = "district_id") %>% 
-  sf::st_transform(3035)
+  dplyr::left_join(attributes_districts, by = "district_id") 
 
 # Check
 sf::st_crs(german_districts_enhanced)
@@ -56,47 +56,62 @@ head(german_districts_enhanced, 2)
 ```
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-We want a first descriptive visual of the distribution of Covid-19 deaths in Mannheim and the surrounding districts. 
-Calculate the number of Covid-19 deaths (`death_rate`) by population (`population`) and multiply with 100,000. 
+We want a first descriptive visual of the distribution of charging stations in Cologne and the surrounding districts. 
+Use the number of charger per district (`charger_count`) and the number of charger per 1,000 inhabitant in each district (`charger_dens`). 
 
-Filter the district of Mannheim (`district_id == "08222"`), find the surrounding districts, and plot Mannheim and its surrounding districts.
+Filter the district of Cologne (`district_id == "05315"`), find the surrounding districts, and plot the two columns for Cologne and its surrounding districts.
 ```
 
 ```{block, opts.label = "clues"}
-You can use the dplyr function `sf::bind_rows()` to combine the two spatial objects, "Mannheim" and "Mannheim Surroundings".
+You can use the dplyr function `sf::bind_rows()` to combine the two spatial objects, "Cologne" and "Cologne Surroundings".
 ```
 
 ```{r second-exercise, solution = TRUE}
-# calculate Covid-19 rate
-german_districts_enhanced <-
-  german_districts_enhanced %>% 
-  dplyr::mutate(covid_deaths_pop = (death_rate / population) * 100000)
 
-# filter Mannheim
-mannheim <-
-  german_districts_enhanced %>% 
-  dplyr::filter(district_id == "08222")
+# one pipe to rule them all
+german_districts_enhanced  <-
+  readr::read_delim("./data/charging_points_ger.csv", 
+                                  delim =";") %>% 
+   filter(!is.na(longitude) & !is.na(latitude)) %>% 
+  sf::st_as_sf(
+    .,    
+    coords = c("longitude", "latitude"),
+    crs = 4326
+  ) %>% 
+  sf::st_transform(. , crs = 3035) %>% 
+  sf::st_join(., german_districts, join = st_within) %>% 
+  dplyr::group_by(district_id) %>%
+  dplyr::summarise(charger_count = n()) %>% 
+  dplyr::mutate(charger_dens = (charger_count*1000) / population) %>%
+  sf::st_drop_geometry() %>% 
+  left_join(german_districts_enhanced, ., by = "district_id")
 
-# filter surrounding districts, append with Mannheim data and select the Covid column
-mannheim_sur <-
+# filter Cologne
+cologne <-
+  german_districts_enhanced %>% 
+  dplyr::filter(district_id == "05315")
+
+# filter surrounding districts, append with Cologne data and select the charger column
+cologne_sur_charger <-
   german_districts_enhanced %>%
-  dplyr::filter(lengths(sf::st_touches(., mannheim)) > 0) %>% 
-  dplyr::bind_rows(mannheim) %>%   
-  dplyr::select(covid_deaths_pop)
+  dplyr::filter(lengths(sf::st_touches(., cologne)) > 0) %>% 
+  dplyr::bind_rows(cologne) %>%   
+  dplyr::select(charger_count, charger_dens)
 
 # plot  
-plot(mannheim_sur)
+plot(cologne_sur_charger)
+
 ```
 
 ```{block, box.title = "3", box.body = list(fill = "white"), box.icon = "fa-star"}
-Save your data set of Mannheim and its surrounding districts as an ESRI Shapefile. 
+Save your data set of Cologne and its surrounding districts as an ESRI Shapefile. 
 ```
 
 ```{r third-exercise, solution = TRUE, eval = FALSE}
 # Export as shapefile
 sf::st_write(
-  cologne_sur, 
-  dsn = "./data/participant_materials/mannheim_covid19_epsg3035.shp", 
+  cologne_sur_charger, 
+  dsn = "./data/participant_materials/cologne_charger_epsg3035.shp", 
   delete_layer = TRUE
 )
 ```
