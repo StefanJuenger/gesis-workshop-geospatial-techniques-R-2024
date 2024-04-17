@@ -28,17 +28,16 @@ The function you may search is part of the `osmdata` package. Have a look at the
 ```
 
 ```{r first, solution = TRUE}
-dresden <-
-  osmdata::getbb("Dresden")
+boothbay <- osmdata::getbb("Boothbay")
 
-plot(dresden)
+plot(boothbay)
 
 # We see two points, which build the extremes of the bounding box.
 ```
 
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-Please choose one or two building types you are interested in and set them as key and value pairs. You can find a list of building types in the [Overpass API documentation](https://wiki.openstreetmap.org/wiki/Key:building). But don't forget to set the timeout query parameters first using the `osmdata::opq()` function.
+Please choose a couple of building types you are interested in and set them as key and value pairs. You can find a list of building types in the [Overpass API documentation](https://wiki.openstreetmap.org/wiki/Key:building). But don't forget to set the timeout query parameters first using the `osmdata::opq()` function.
 ```
 
 ```{block, opts.label = "clues"}
@@ -46,15 +45,14 @@ First, you specify the bounding box like before, second, the query parameters, a
 ```
 
 ```{r second, solution = TRUE}
-dresden <-
-  osmdata::getbb("Dresden") %>% 
-  osmdata::opq(timeout = 25*100) %>% 
+boothbay <-
+  osmdata::getbb("Boothbay") |>  
+  osmdata::opq(timeout = 25*100) |> 
   osmdata::add_osm_feature(
     key = "building", 
-    value = c("house", "residential")
+    value = c("house", "residential", "apartments", "detached", "bungalow")
   )
 ```
-
 
 ```{block, box.title = "3", box.body = list(fill = "white"), box.icon = "fa-star"}
 Download the data using the `osmadata::osmdata_sf()` function and extract only the polygons. 
@@ -65,15 +63,15 @@ The downloaded data are a list. The polygons are a named list element that you c
 ```
 
 ```{r third, solution = TRUE}
-dresden <-
-  osmdata::getbb("Dresden") %>% 
-  osmdata::opq(timeout = 25*100) %>% 
+boothbay <-
+  osmdata::getbb("Boothbay") |>  
+  osmdata::opq(timeout = 25*100) |> 
   osmdata::add_osm_feature(
     key = "building", 
-    value = c("house", "residential")
-  ) %>% 
-  osmdata::osmdata_sf() %>% 
-  .$osm_polygons
+  ) |> 
+  osmdata::osmdata_sf()
+
+boothbay <- boothbay$osm_polygons
 ```
 
 
@@ -88,21 +86,16 @@ You may consider converting the data into a tibble using `tibble::as_tibble()` a
 ```{r fourth, solution = TRUE}
 library(tmap)
 
-dresden <-
-  osmdata::getbb("Dresden") %>% 
-  osmdata::opq(timeout = 25*100) %>% 
-  osmdata::add_osm_feature(
-    key = "building", 
-    value = c("house", "residential")
-  ) %>% 
-  osmdata::osmdata_sf() %>% 
-  .$osm_polygons %>% 
-  tibble::as_tibble() %>% 
+boothbay <-
+  boothbay |> 
+  tibble::as_tibble() |> 
   sf::st_as_sf()
 
-dresden
+boothbay
 
-tm_shape(dresden) +
+tmap_mode(("view"))
+
+tm_shape(boothbay) +
   tm_polygons()
 ```
 
