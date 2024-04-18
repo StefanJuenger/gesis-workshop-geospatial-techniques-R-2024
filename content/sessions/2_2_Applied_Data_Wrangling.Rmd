@@ -391,18 +391,20 @@ correspondence_table
 
 ## Conduct the Survey
 
-We ask respondents for some standard sociodemographics. But we also apply a new and highly innovative item score, called the Fake Corona Burden Score (FCBS) using the [`faux` package](https://cran.r-project.org/web/packages/faux/index.html).
+We ask respondents  some standard sociodemographics. But we also include an item from the [GLES Panel](https://doi.org/10.4232/1.14114) on energy transformation: "From 2030, no more new cars with petrol or diesel engines are to be registered in Germany. Do you agree?" (entrans). Since we cannot share the real data we created some fake data using the [`faux` package](https://cran.r-project.org/web/packages/faux/index.html).
+
 
 ```{r hidden-data, include = FALSE}
 secret_data <- readRDS("./data/secrect_data.rds")
 
 secret_variable_we_are_hiding_from_you <-
   faux::rnorm_pre(
-        secret_data$pop_dens, 
+        secret_data$dist_km, 
         mu = 50, 
         sd = 10, 
         r = -0.5
       )
+
 ```
 
 ```{r simulate-survey-data}
@@ -418,7 +420,7 @@ fake_survey_data <-
       as.factor(),
     income =
       sample(100:10000, 1000, replace = TRUE),
-    fcbs = secret_variable_we_are_hiding_from_you
+    entrans = secret_variable_we_are_hiding_from_you
   )
 ```
 
@@ -432,95 +434,187 @@ fake_survey_data
 
 ---
 
-## What could explain our Fake Corona Burden Score?
+## What could explain our ?
 
-*Likelihood to meet people*
-> Higher district's population density, lower Fake Corona Burden Score.
-
---
-
-*Provision of health services*
-> Higher distance to closest hospital,  higher  Fake Corona Burden Score.
+*Access to charging infrastructure*
+> Better access to charging infrastructure,  higher support for energy transformation.
 
 --
 
-*Possible language issues in health care communication*
-> Higher immigrant rate in the neighborhood, higher Fake Corona Burden Score.
+*Alternative means of transport*
+> Better access to public transportation, higher support for energy transformation.
+
+--
+
+*Rural-urban divide*
+> Higher population density, higher support for energy transformation.
+
 
 ---
 
-## Population Density
+## District-level Data
 
-When all data sets are loaded, we reduced our sample to the area North Rhine Westphalia.
+On the district level, we have already most of our information and/or created the indicator yesterday.
+Let's load the respective data, reduce it to NRW, and have a look.
 
-```{r load-data-hidden, echo = F, warning = F, message = F}
-
-sampling_area_districts_enhanced <-
-  # load district shapefile
-  sf::read_sf("./data/VG250_KRS.shp") %>% 
-  # transform crs
-  sf::st_transform(3035) %>% 
-  # some data cleaning
-  dplyr::rename(district_id = AGS) %>% 
-  dplyr::select(district_id) %>% 
-  # left join attributes
-  dplyr::left_join(. , 
-                   readr::read_csv("./data/attributes_districts.csv"), 
-                   by = "district_id" ) %>% 
-# reduce to area of nrw: x intersects y
-sf::st_join(.,
-            sampling_area, 
-            join = sf::st_intersects, 
-            left = FALSE)
-
-hospitals <-
-  readr::read_csv("./data/hospital_points.csv") %>%
-  sf::st_as_sf(coords = c("X", "Y"), crs = 3035)
-
-sampling_area_hospitals <-
-  hospitals %>% 
-  sf::st_join(
-    sampling_area_districts_enhanced %>% 
-      dplyr::select(geometry),
-    join = st_within
-  )
-
-```
 
 
 ```{r prep_data, eval = F}
 
-sampling_area_districts_enhanced <-
+sampling_area_attributes <-
   # load district shapefile
   sf::read_sf("./data/VG250_KRS.shp") %>% 
   # transform crs
   sf::st_transform(3035) %>% 
   # some data cleaning
-  dplyr::rename(district_id = AGS) %>% 
+  dplyr::mutate(district_id = as.numeric(AGS)) %>% 
   dplyr::select(district_id) %>% 
-  # left join attributes
+  # reduce to area of nrw: x intersects with y
+  sf::st_join(.,
+              sampling_area, 
+              join = sf::st_intersects, 
+              left = FALSE) %>% 
+  # add attribute table
   dplyr::left_join(. , 
-                   readr::read_csv("./data/attributes_districts.csv"), 
-                   by = "district_id" ) %>% 
-# reduce to area of nrw: x lies within y
-sf::st_join(.,
-            sampling_area, 
-            join = sf::st_intersects, 
-            left = FALSE)
+                   readr::read_delim("./data/attributes_districts.csv",
+                                     delim = ";"), 
+                   by = "district_id") 
+
+head(sampling_area_attributes, 4)
+
+```
+
+
+```{r load-data-hidden, echo = F, warning = F, message = F}
+
+sampling_area_attributes <-
+  # load district shapefile
+  sf::read_sf("./data/VG250_KRS.shp") %>% 
+  # transform crs
+  sf::st_transform(3035) %>% 
+  # some data cleaning
+  dplyr::mutate(district_id = as.numeric(AGS)) %>% 
+  dplyr::select(district_id) %>% 
+  # reduce to area of nrw: x lies within y
+  sf::st_join(.,
+              sampling_area, 
+              join = sf::st_within, 
+              left = FALSE) %>% 
+  # add attribute table
+  dplyr::left_join(. , 
+                   readr::read_delim("./data/attributes_districts.csv",
+                                     delim = ";"), 
+                   by = "district_id") 
+
+head(sampling_area_attributes, 4)
+
+```
+
+
+---
+
+## District Operationalization
+
+*Access to charging infrastructure*
+> Charging stations per 1000 inhabitant in a district
+
+*Alternative means of transport*
+> Distance to public transportation in a district
+
+*Rural-urban divide*
+> Population Density in a district
+
+
+---
+
+## Access to charging infrastructure
+
+Luckily, we already calculated this yesterday!
+
+```{r access-charging infrastructure}
+
+
+charger_nrw <- 
+  # Read charging station points datae
+  readr::read_delim("./data/charging_points_ger.csv", 
+                                 delim = ";") %>%
+  # Filter out rows with missing longitude or latitude
+  filter(!is.na(longitude) & !is.na(latitude)) %>%
+  # Convert data frame to sf object
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+  # Reproject the spatial data to the desired CRS (Coordinate Reference System)
+  sf::st_transform(crs = 3035) %>%
+  # Subset point data to sampling area
+  sf::st_intersection(sampling_area)
+
+
+sampling_area_attributes <- 
+  charger_nrw %>%
+  # spatial join district ids
+  sf::st_join(sampling_area_attributes %>% dplyr::select(district_id), 
+              join = sf::st_within) %>%
+  # Group by district ID
+  dplyr::group_by(district_id) %>%
+  # Summarize the number of chargers in each district
+  dplyr::summarise(charger_count = n()) %>%
+  # Drop geometry column
+  sf::st_drop_geometry() %>%
+  # Left join with sampling area attributes
+  left_join(sampling_area_attributes, ., by = "district_id") %>%
+  # Calculate charger density per 1000 population
+  dplyr::mutate(charger_dens = (charger_count * 1000) / population)
 
 
 ```
 
+
 ---
 
-## Calculate size of the area
+## Alternative means of transport
+
+We got that Information from the INKAR database: Population-weighted linear distance to the nearest public transport stop with at least 20 departures per day.
+
+```{r transport-map-disp, echo=F}
+
+  tm_shape(sampling_area_attributes) + 
+  tm_polygons(col = 
+            "publictransport_meandist",
+          title = 
+            "Access Public Transport",
+          palette = "viridis",
+          n=10,
+          style = "jenks"
+          ) +
+  tm_layout(main.title = 
+              "Mean Dist. Public Transport",
+            main.title.color = 
+              "black" ) +
+  tm_legend(legend.outside = 
+              TRUE,
+            legend.outside.position = 
+              "left")
+
+```
+]
+
+---
+
+## Rural-urban divide
+
+Our attribute table contains the number of inhabitants per district but not the population density.
+Therefore, we need to calculate the area of the district.
 
 ```{r area-calc}
 
 # calculate area of districts
 # areas will always be calculated
 # in units according to the CRS 
-sf::st_area(sampling_area_districts_enhanced) %>% 
+sf::st_area(sampling_area_attributes) %>% 
+  head(4)
+
+sampling_area_attributes %>% 
+  sf::st_transform(4326) %>% 
+  sf::st_area(.) %>% 
   head(4)
 
 ```
@@ -529,119 +623,55 @@ sf::st_area(sampling_area_districts_enhanced) %>%
 ---
 
 ## Population Density
-All left to do is a simple mutation. Let's pipe it!
+
+All left to do is a simple mutation:
 
 .pull-left[
 ```{r pop-dens-pipe, eval = F}
+
 # calculation population density
-sampling_area_districts_enhanced <-
-  sampling_area_districts_enhanced %>% 
+sampling_area_attributes <-
+  sampling_area_attributes %>% 
   # calculate area of districts (areas will always
   # be calculatednin units according to the CRS )
   dplyr::mutate(area = sf::st_area(.)) %>% 
   # change unit to square kilometers
   dplyr::mutate(area_km2 = units::set_units
-                    (area, km^2)) %>% 
+                (area, km^2)) %>% 
   # recode variable as numeric
   dplyr::mutate(area_km2 = as.numeric
-                    (area_km2)) %>% 
+                (area_km2)) %>% 
   # calculate population density
   dplyr::mutate(pop_dens = population/
-           area_km2)
+                  area_km2)
 ```
 ]
 
 .pull-right[
 ```{r, echo = F}
-sampling_area_districts_enhanced <-
-  sampling_area_districts_enhanced %>% 
-  # calculate area 
+
+# calculation population density
+sampling_area_attributes <-
+  sampling_area_attributes %>% 
+  # calculate area of districts (areas will always
+  # be calculatednin units according to the CRS )
   dplyr::mutate(area = sf::st_area(.)) %>% 
   # change unit to square kilometers
   dplyr::mutate(area_km2 = units::set_units
-                    (area, km^2)) %>% 
+                (area, km^2)) %>% 
   # recode variable as numeric
   dplyr::mutate(area_km2 = as.numeric
-                    (area_km2)) %>% 
+                (area_km2)) %>% 
   # calculate population density
   dplyr::mutate(pop_dens = population/
-           area_km2)
+                  area_km2)
 
-tm_shape(sampling_area_districts_enhanced) +
+tm_shape(sampling_area_attributes) +
   tm_fill("pop_dens", breaks = c(0,100,200,400,800,1600,3200, Inf))+
   tm_layout(legend.outside = TRUE)
 ```
 ]
 
----
-
-## Aggregate Data 
-
-Squeezing in a small example on data aggregation. If you do not have id information or additional shapefiles, you can rely on `st_combine(x)` , `st_union(x,y)` and `st_intersection(x,y)` to combine shapefiles, resolve borders and return the intersection of two shapefiles. 
-
-
-.pull-left[
-```{r aggregate-data}
-
-# load data
-german_states <- 
-  sf::read_sf("./data/VG250_LAN.shp") %>% 
-  sf::st_transform(3035) %>% 
-  dplyr::filter(GF == 4) %>% 
-  dplyr::rename(state_id = AGS) %>% 
-  dplyr::select(state_id)
-
-german_districts <-
-  sf::read_sf("./data/VG250_KRS.shp") %>% 
-  sf::st_transform(3035) %>% 
-  dplyr::rename(district_id = AGS) %>% 
-  dplyr::select(district_id) %>% 
-  dplyr::left_join(. , 
-                   readr::read_csv("./data/attributes_districts.csv"), 
-                   by = "district_id" )
-
-
-```
-]
-
-.pull-right[
-```{r aggregate-data2}
-# the 'dplyr way' 
-district_aggregated_by_state <-
-  st_join(german_districts,
-          german_states, 
-          join = sf::st_intersects,
-          left = TRUE) %>%
-  group_by(state_id) %>% 
-  dplyr::summarise(state_death_rate = 
-              sum(death_rate,
-                  na.rm = TRUE))
-
-
-```
-]
-
----
-
-## Aggregate Data
-
-.pull-left[
-```{r show-aggregation-code, eval=FALSE}
-
-tm_shape(district_aggregated_by_state) +
-  tm_polygons(col = "state_death_rate")
-
-```
-]
-
-.pull-right[
-```{r show-aggregation, echo=FALSE}
-
-tm_shape(district_aggregated_by_state) +
-  tm_polygons(col = "state_death_rate")
-
-```
-]
 
 ---
 
@@ -651,19 +681,18 @@ We have population density on the district level. Since our analysis focuses on 
 
 ```{r join-disp}
 
-# join back
-spatial_information <-
-  sampling_area_districts_enhanced %>%
+district_linked_df <-
+  sampling_area_attributes %>%
   # keeping just the variables we want
-  dplyr::select(district_id, pop_dens) %>% 
+  dplyr::select(charger_dens,publictransport_meandist, pop_dens) %>% 
   # since we want to join district to
   # respondent defining coordintes first
   sf::st_join(fake_coordinates,
-  # district data second
-          . ,
-    # some points may lie on the border
-    # choosing intersects therefore
-          join = sf::st_intersects) %>% 
+              # district data second
+              . ,
+              # some points may lie on the border
+              # choosing intersects therefore
+              join = sf::st_intersects) %>% 
   # drop our coordinates for data protection
   sf::st_drop_geometry()
 
@@ -674,234 +703,196 @@ spatial_information <-
 ## Respondents in Districts
 
 ```{r join-disp-print}
-head(spatial_information, 5)
+head(district_linked_df, 5)
 ```
 
 ---
 
-# Distance Calculation
+## Too boring? Let's scale it down!
 
-`sf::st_distance()` will calculate between **all** respondents and **all** hospitals resulting in a matrix with 1,786,000 objects (1,000 respondent * 1,786 hospitals). We can make our lives a little bit easier by treating this matrix as a `tibble`.
+We have our nice fake coordinates and we do know that we also have variation within some districts (E.g. cologne), concerning e-car mobility.
+So let's try to operationalize the variables on a smaller level of aggregation.
 
-.pull-left[
-```{r dist_matr-disp, eval = F}
-# distances between each respondent 
-# and each hospital
-distance_matrix <- 
-  # point layer "distance from" 
-  sf::st_distance(
-    fake_coordinates, 
-    # point layer "distance to"
-    sampling_area_hospitals,
-    # dense matrix with all 
-    # pairwise distance
-    by_element = FALSE
+*Access to charging infrastructure*
+> Charging stations in a 2000m buffer
+
+*Alternative means of transport*
+> Distance to closest train stop
+
+*Rural-urban divide*
+> Population in a 2000m buffer 
+
+---
+
+## Charging stations in 2000m buffer
+
+To calculate the number of chargers in a 2km buffer, the procedure is very similar to calculating the buffers in a district.
+
+```{r charging-stations}
+
+# Create 2000m buffers around the fake coordinates
+buffers <- 
+  fake_coordinates %>%
+  sf::st_buffer(dist = 2000)
+
+# Perform intersection between buffers and points_sf
+inter <- 
+  sf::st_intersects(buffers, charger_nrw)
+
+# Count points within each buffer
+coordinate_linked_df <- 
+  fake_coordinates %>%
+  mutate(num_charger = lengths(inter))
+
+
+```
+
+---
+
+## Calculate distance
+
+To measure access to alternative transportation (e.g. public transport), we want to measure the distance to the closest train station for each respondent. 
+We can get the train station points from OSM.
+
+```{r trainstation-osm-load, echo = FALSE, include = FALSE}
+
+
+nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
+
+```
+
+```{r trainstation-osm-load-disp, eval = FALSE}
+
+nrw_pt_stops <-
+  osmdata::getbb(
+    "Nordrhein-Westfalen" 
   ) %>% 
-  # making life a little bit easier
-  dplyr::as_tibble() 
+  osmdata::opq(timeout = 25*100) %>% 
+  osmdata::add_osm_feature(key = "public_transport", value = "stop_position") %>% 
+  osmdata::osmdata_sf()
 
-# check our matrix
-# again, units = CRS units!
-distance_matrix
-```
-]
 
-.pull-right[
-```{r dist-matr, echo = F}
-# calculate distances between each respondent and each hospital
-# point layer "distance from" 
-sf::st_distance(
-  fake_coordinates, 
-  # point layer "distance to"
-  sampling_area_hospitals,
-  # returns dense matrix with all pairwise distance
-  by_element = FALSE) %>% 
-  dplyr::as_tibble()
+nrw_pt_stops <-
+  nrw_pt_stops$osm_points %>%  
+  tibble::as_tibble() %>%  
+  sf::st_as_sf() %>%  
+  sf::st_transform(3035) 
+
+nrw_pt_trainstops <-
+  nrw_pt_stops %>% 
+  dplyr::filter(train == "yes") %>% 
+  dplyr::select()
+
+
+# takes a while, so sneaky preperation
+nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
+
 ```
-]
 
 ---
 
-## Find Minimum Distance
+## Distance Calculation
 
-That's all there is concerning the "spatial" part of our data wrangling. 
-From now on, just good old data crunching to get our distance to the closest hospital.
+`sf::st_distance()` will calculate between **all** respondents and **all** train stations resulting in a matrix with 1,786,000 objects (1,000 respondent * 1,786 hospitals). We can make our lives a little bit easier by first identifying the nearest station and then calculate the distance.
 
 .pull-left[
-```{r closest-hosp-disp, eval = F}
-distance_closest <-
-    distance_matrix %>% 
-    # from unit to numeric
-    dplyr::mutate_all(as.numeric) %>% 
-    # identify for each row the minimum
-    # & save in variable
-    dplyr::mutate(dist_closest_hospital = 
-                  (apply(., 1, min))) %>%  
-    # get kilometer instead of meter
-    dplyr::mutate(dist_closest_hospital = 
-                    dist_closest_hospital/1000 ) %>%
-    # select only column 
-    # containing smallest distance
-    dplyr::select(dist_closest_hospital)
+```{r dist-disp}
+
+# Find the nearest charging station 
+nearest_station <- 
+  sf::st_nearest_feature(fake_coordinates, 
+                         nrw_pt_trainstops)
+
+# Calculate the distance between each point in
+# fake_coordinates & its nearest charging station
+distances <-
+  sf::st_distance(fake_coordinates, 
+                 nrw_pt_trainstops[nearest_station,], 
+                  by_element = TRUE)
+
+# add a column for the distances
+coordinate_linked_df  <- 
+  coordinate_linked_df %>%
+  mutate(
+    # Calculate distances in kilometers 
+    dist_km = as.numeric(distances) / 1000) 
+
 ```
 ]
 
 .pull-right[
-```{r closest-hosp, echo = F}
-sf::st_distance(
-  fake_coordinates, 
-  sampling_area_hospitals,
-  by_element = FALSE
-) %>% 
-  dplyr::as_tibble() %>% 
-  dplyr::mutate_all(as.numeric) %>% 
-  # identify for each row the minimum & save var
-  dplyr::mutate(dist_closest_hospital = (apply(., 1, min))) %>% 
-  dplyr::mutate(dist_closest_hospital = dist_closest_hospital/1000) %>% 
-  # select only column containing smallest distance
-  dplyr::select(dist_closest_hospital)
+```{r dist-data, echo = F}
 
-```
+summary(coordinate_linked_df$dist_km)
 
-]
-
----
-
-## Join to our spatial information!
-
-I prefer to work with kilometers rather than meters. And I want to add our new variable to the other spatial information we already prepared. Luckily, I know that the spatial information table has the same length and order as the fake coordinates.
-
-.pull-left[
-```{r dist-resp-disp, eval = F}
-spatial_information <-
-  distance_closest %>% 
-  # bind columns with spatial information
-  # only bind with other data set than the
-  # original coordinates when you are 100
-  # percent sure it's same length and order!
-  dplyr::bind_cols(spatial_information, .) 
-```
-]
-
-.pull-right[
-```{r dist-resp, echo = F}
-spatial_information <-
-  sf::st_distance(
-    fake_coordinates, 
-    sampling_area_hospitals,
-    by_element = FALSE
-  ) %>% 
-  dplyr::as_tibble() %>% 
-  dplyr::mutate_all(as.numeric) %>% 
-  dplyr::mutate(dist_closest_hospital = (apply(., 1, min))) %>%  
-  dplyr::select(dist_closest_hospital) %>% 
-  dplyr::bind_cols(spatial_information, .) 
-
-head(spatial_information,6)
 ```
 ]
 
 ---
 
-## Immigrant Rate Buffers
+## Population Buffers
 
-...and we're not yet done: we still need the immigrant rate in the neighborhood. Let's calculate buffers of 500 meters and add their mean values to our dataset.
+...and we're not yet done: we still need the population in the neighborhood. Let's calculate buffers of 2000 meters and add the population mean values to our dataset.
 
-```{r load-link-data, include = FALSE}
+```{r raster-buffer-link}
 
-# download data & create rate
-immigrants_nrw <- 
-  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) %>% 
-  terra::crop(. , sampling_area)
-
+# download data & extract information
 inhabitants_nrw <-
   z11::z11_get_100m_attribute(Einwohner) %>% 
   terra::crop(. , sampling_area)
 
-immigrant_rate <-
-  immigrants_nrw * 100 / 
-  inhabitants_nrw
 
-# calculate immigrant rate for 500m buffer
-immigrant_buffers <- 
-terra::extract(
-  immigrant_rate, 
-  fake_coordinates %>% 
-    sf::st_buffer(500) %>% 
-    terra::vect(), 
-  fun = mean,
-  na.rm = TRUE
+# spatially link "on the fly"
+population_buffers <- 
+  terra::extract(
+    inhabitants_nrw, 
+    fake_coordinates %>% 
+      sf::st_buffer(2000) %>% 
+      terra::vect(), 
+    fun = mean,
+    na.rm = TRUE
   )
-# spatially link with buffers on the fly
-spatial_information <-
-  spatial_information %>% 
-  dplyr::mutate(immigrant_buffers = immigrant_buffers[[2]])
+
+# link with data 
+coordinate_linked_df <-
+  coordinate_linked_df %>% 
+  dplyr::mutate(population_buffer = population_buffers[[2]])
+
 
 ```
 
-
-.pull-left[
-```{r load-noeval, eval = FALSE}
-
-# download data & create rate
-immigrants_nrw <- 
-  z11::z11_get_100m_attribute(STAATSANGE_KURZ_2) %>% 
-  terra::crop(. , sampling_area)
-
-inhabitants_nrw <-
-  z11::z11_get_100m_attribute(Einwohner) %>% 
-  terra::crop(. , sampling_area)
-
-immigrant_rate <-
-  immigrants_nrw * 100 / 
-  inhabitants_nrw
-
-```
-]
-
-.pull-right[
-```{r link-noeval, eval = FALSE}
-
-# calculate immigrant rate for 500m buffer
-immigrant_buffers <- 
-terra::extract(
-  immigrant_rate, 
-  fake_coordinates %>% 
-    sf::st_buffer(500) %>% 
-    terra::vect(), 
-  fun = mean,
-  na.rm = TRUE,
-  ID = FALSE,
-  raw = TRUE
-  )
-# spatially link with buffers on the fly
-spatial_information <-
-  spatial_information %>% 
-  dplyr::mutate(immigrant_buffers = immigrant_buffers[[2]])
-
-```
-]
 
 ```{r save-secret-data, echo = FALSE, include = FALSE}
-saveRDS(spatial_information, "./data/secrect_data.rds")
+
+
+coordinate_linked_df %>% 
+  dplyr::bind_cols(district_linked_df) %>% 
+  saveRDS(., "./data/secrect_data.rds")
+
 ```
 
 
 ---
 
-## Join with Fake Burden Score
+## Join with Survey
 
 I hope you're not tired to join data tables.
 Since we care a tiny bit more about data protection than others, we have yet another joining task left: joining the information we received using our (protected) fake coordinates to the actual survey data via the correspondence table.
 
 .pull-left[
 ```{r spatial-info-join}
+
 # last joins for now
 fake_survey_data_spatial <-
   # first join the id
   dplyr::left_join(
     correspondence_table, 
-    spatial_information, 
+    district_linked_df, 
+    by = "id_2"
+  ) %>% 
+  dplyr::left_join(
+    ., 
+    coordinate_linked_df, 
     by = "id_2"
   ) %>% 
   # drop the fake_coordinate id
@@ -916,12 +907,15 @@ fake_survey_data_spatial <-
 
 .pull-right[
 ```{r correlation-plot, echo = FALSE, out.width = "75%"}
+
 fake_survey_data_spatial %>% 
   dplyr::select(
-    fcbs, pop_dens, dist_closest_hospital, immigrant_buffers
+    entrans, pop_dens, charger_dens, publictransport_meandist,
+    dist_km, num_charger, population_buffer
   ) %>% 
   corrr::correlate() %>% 
   corrr::network_plot(min_cor = .1)
+
 ```
 
 ]
@@ -1017,7 +1011,7 @@ woRkshoptools::include_picture("Abb2.png")
 
 ---
 
-## Left Behind by the State? (Stroppe, Forthcoming)
+## Left Behind by the State? (Stroppe, 2023)
 
 > Are political trust levels affected by the accessibility of public services and infrastructures for citizens?
 

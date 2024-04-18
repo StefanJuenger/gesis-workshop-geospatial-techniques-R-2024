@@ -40,9 +40,9 @@ library(dplyr)
 # code based on the original
 german_districts <- 
   sf::read_sf("./data/VG250_KRS.shp") %>% 
-  dplyr::rename(district_id = AGS)
+  dplyr::mutate(district_id = as.numeric(AGS))
 
-attributes_districts <-  readr::read_csv("./data/attributes_districts.csv") 
+attributes_districts <-  readr::read_delim("./data/attributes_districts.csv", delim = ";") 
 
 german_districts_enhanced <- 
   german_districts %>% 
@@ -64,15 +64,15 @@ tm_shape(german_districts_enhanced) +
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
 In a second step, we want to visualize some information on the German districts contained in the attribute table.
-Choose the column `death_rate` and create a map of Covid-19 deaths in Germany.
+Choose a column of interest and create a map.
 Alternate the map by:
 
 - add a legend title and change the color palette
 - add a title to the map and change the font color of the title
 - place the legend outside of the map at the bottom
-- ...
+- change the style to process the color scale (categorization) of your attribute.
 
-Assign your map to an object called `covid_map`.
+Assign your map to an object called `ger_map`.
 ```
 
 
@@ -82,6 +82,8 @@ Combine the following options with a plus sign:
 - add a legend title and change the color palette: `tm_fill(col = "", title = "", palette = "") +`
 - add a title to the map and change the font color of the title: `tm_layout(title = "", title.color = "") +`
 - place the legend outside: `tm_legend(legend.outside = TRUE/FALSE, legend.outside.position = "")`
+- change the style and categorization:   `style = ("cat", "fixed", "sd", "equal", "pretty", "quantile", "kmeans", "hclust", "bclust", "fisher", "jenks", "dpih", "headtails", log10_pretty", "cont")`
+
 
 If you run `colors()`, R returns the names of all built-in colors.
 ```
@@ -92,42 +94,15 @@ To assign your map to an object, use the arrow `<-`.
 
 ```{r second-exercise, solution = TRUE}
 
-# plot the covid-19 cases per 100.000 inhabitants
+ger_map <-
 tm_shape(german_districts_enhanced) + 
-  tm_fill(col = "death_rate")                   # "col" can be the name of a color or a column name
+  tm_fill(col = "publictransport_meandist",              # "col" can be the name of a color or a column name
+          title = "Mean Distances to Stops",             # add a title to the legend
+          palette = "RdPu",                              # add palette  
+          style = "cont")  +                             # change style 
+  tm_layout(title = "Access Public Transport",           # alternate the overall layout like title
+            title.color = "blue" ) +                     # changes the font color of the title +
+   tm_legend(legend.outside = TRUE,                      # positions the legend outside           
+            legend.outside.position = "left")            # defines legend positions 
 
-# change the title of the legend and the color palette
-tm_shape(german_districts_enhanced) + 
-  tm_fill(col = "death_rate",
-          title = "Covid-19 Death Rate",    # add a title to the legend
-          palette = "RdPu")                     # change the color palette
-
-# add a title in the color blue
-tm_shape(german_districts_enhanced) + 
-  tm_fill(col = "death_rate",
-          title = "Covid-19 Death Rate",
-          palette = "RdPu") +
-  tm_layout(title = "Covid Deaths in Germany",        # alternate the overall layout like title
-            title.color = "blue" )                   # changes the font color of the title
-
-# place the legend outside of the map to the left
-tm_shape(german_districts_enhanced) + 
-  tm_fill(col = "death_rate",
-          title = "Covid-19 Death Rate",
-          palette = "RdPu") +
-  tm_layout(title = "Covid Deaths in Germany",
-            title.color = "blue" ) +
-  tm_legend(legend.outside = TRUE,                  # positions the legend outside           
-            legend.outside.position = "left")       # defines legend positions 
-
-# save your map in an object called "covid_map"
-covid_map <-  
-  tm_shape(german_districts_enhanced) + 
-  tm_fill(col = "death_rate",
-          title = "Covid-19 Death Rate",
-          palette = "RdPu") +
-  tm_layout(main.title = "Covid Deaths in Germany",
-            main.title.color = "blue" ) +
-  tm_legend(legend.outside = TRUE,
-            legend.outside.position = "left") 
 ```

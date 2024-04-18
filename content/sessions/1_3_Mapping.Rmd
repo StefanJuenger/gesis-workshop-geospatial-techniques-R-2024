@@ -99,6 +99,7 @@ attributed_cologne <-
 charger_cologne <- sf::read_sf("./data/charger_cologne.shp")
 
 streets_cologne <- sf::read_sf("./data/streets_cologne.shp")
+
 ```
 
 ---
@@ -439,27 +440,6 @@ tm_shape(attributed_cologne) +
 
 ---
 
-class: middle
-
-## Exercise 1_3_1: Basic Maps
-
-[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_3_1_Basic_Maps.html)
-
-[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_3_1_Basic_Maps.html)
-
----
-
-## What's Left?
-
-<br>
-.center[
-```{r enough-maps, echo = FALSE, out.width = "70%"}
-woRkshoptools::include_picture("enough_maps.jpg")
-```
-]
-
----
-
 ## Compasses & Scale Bars
 
 .pull-left[
@@ -484,23 +464,49 @@ tm_shape(attributed_cologne) +
 
 ---
 
+class: middle
+
+## Exercise 1_3_1: Basic Maps
+
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_3_1_Basic_Maps.html)
+
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_3_1_Basic_Maps.html)
+
+---
+
+## What's Left?
+
+<br>
+.center[
+```{r enough-maps, echo = FALSE, out.width = "70%"}
+woRkshoptools::include_picture("enough_maps.jpg")
+```
+]
+
+---
+
+
 ## Getting Interactive (as an Alternative To `mapview::mapview()`)!
 
 .pull-left[
 ```{r interactive-map, eval = FALSE}
-tmap_mode("view")
 
+ecar_map <-
 tm_shape(attributed_cologne) +
-  tm_borders(col = "red")
+  tm_borders(col = "black") +
+  tm_polygons("ecar")
+
+tmap_mode("view")
+ecar_map
+
 ```
 ]
 
 .pull-right[
-```{r interactive-map-exec, echo = FALSE, eval = TRUE, out.height="50%", fig.align='center'}
+```{r interactive-map-exec, echo = FALSE, eval = TRUE, out.width="80%", out.height="80%"}
 tmap_mode("view")
 
-tm_shape(attributed_cologne) +
-  tm_borders(col = "red")
+ecar_map 
 
 tmap_mode("plot")
 ```
@@ -508,22 +514,52 @@ tmap_mode("plot")
 
 ---
 
-# Note On Mapping Responsible
+## Facets I
 
-.pull-left[
-**In the best cases**, maps are easy to understand and an excellent way to transport (scientific) messages.
-]
+```{r facets-disp-I, out.width="55%"}
 
-.pull-right[
-**In the worst cases**, they simplify (spurious) correlations and draw a dramatic picture of the world.
-]
+ tm_shape(attributed_cologne) +
+    tm_polygons(c("cdu", "spd", "greens", "afd", "left", "fdp")) +
+    tm_facets( ncol = 3)
 
-**Maps can shape narratives**
-- Decisions on which projection you use (remember the `true size` projector?), 
-- the segment of the world you choose, 
-- and the colors you add have a strong influence.
+```
 
-Example: [Kenneth Field's blog post](https://www.esri.com/arcgis-blog/products/product/mapping/mapping-coronavirus-responsibly/)
+---
+
+## Facets II
+
+
+```{r facets-disp-II-disp, out.width="50%",  out.height="50%"}
+
+attributed_cologne %>%
+  dplyr::mutate(city_area = as.integer(substr(id, 1, 1)))
+  tm_shape(.) +
+    tm_polygons(c("ecar")) +
+    tm_facets(by = "city_area", nrow = 2) +
+    tm_layout(panel.labels = c("1 Innenstadt","2 Rodenkirchen","3 Lindenthal",
+                                "4 Ehrenfeld", "5 Nippes","6 Chorweiler",
+                                "7 Porz", "8 Kalk", "9 Mülheim")) 
+
+```
+
+
+
+
+
+
+---
+
+## Change Style
+
+```{r styles, out.width="55%"}
+
+tm_shape(attributed_cologne) +
+    tm_polygons("ecar") +
+  tm_style("classic") 
+# other available styles are: "beaver", "bw", "watercolor" ,
+# "white", "gray", "natural", "cobalt", "col_blind", "albatross",
+
+```
 
 ---
 
@@ -554,6 +590,80 @@ colorBlindness::cvdPlot(tmp)
 ```
 
 .tinyisher[Created with the package [`colorBlindness`](https://cran.r-project.org/web/packages/colorBlindness/index.html)]
+
+---
+
+## Animation
+
+`tm_animate` allows you to create animated maps and visualize changes in spatial data e.g. over time or attributes.
+You can customize the animation's duration, frame rate, timeline sliders and transition effects.
+
+.pull-left[
+```{r annimate-map, eval=F}
+
+
+vote_gif <- 
+  attributed_cologne %>% 
+   tidyr::pivot_longer(., 
+    cols = c("cdu", "spd", "greens", "afd", 
+             "left", "fdp"),  # Select all columns to pivot
+    names_to = "party_id",  # New column name for party identifier
+    values_to = "voteshare") # New column name for vote shares %>% 
+    tm_shape(.) +
+    tm_polygons(c("voteshare")) +
+    tm_facets(along = "party_id")  
+
+tmap_animation(vote_gif, 
+               filename = "./content/img/vote_gif.gif", 
+               delay=150) 
+
+
+```
+]
+
+.pull-right[
+```{r pic-formulas, echo = F, out.width="70%"}
+woRkshoptools::include_picture("vote_gif.gif")
+```
+]
+
+---
+
+## Save Maps
+
+`tmap` offers support for various output formats, including:
+- Static Images: PNG, JPEG, TIFF, etc.
+- Interactive Web Maps: HTML, JavaScript (using packages like leaflet).
+- Animated Maps: GIF, MP4, etc.
+
+You can alsp control width and height, dpi etc.
+
+```{r save-maps, eval = F}
+
+# save regular map
+tmap_save(area_map, filename = "are_map.png")
+# save as interactive map
+tmap_save(ecar_map, filename = "ecar_map.html" )
+```
+
+
+---
+# Note On Mapping Responsible
+
+.pull-left[
+**In the best cases**, maps are easy to understand and an excellent way to transport (scientific) messages.
+]
+
+.pull-right[
+**In the worst cases**, they simplify (spurious) correlations and draw a dramatic picture of the world.
+]
+
+**Maps can shape narratives**
+- Decisions on which projection you use (remember the `true size` projector?), 
+- the segment of the world you choose, 
+- and the colors and styles you add have a strong influence.
+
+Example: [Kenneth Field's blog post](https://www.esri.com/arcgis-blog/products/product/mapping/mapping-coronavirus-responsibly/)
 
 ---
 
@@ -679,6 +789,7 @@ ecar_map
  
 ```
 ]
+
 ---
 
 ##  E-Mobility and Charging Stations 
@@ -753,6 +864,7 @@ ecar_chargers_map <-
 ecar_chargers_map
 ```
 ]
+
 ---
 
 ## German Federal Election 2021
