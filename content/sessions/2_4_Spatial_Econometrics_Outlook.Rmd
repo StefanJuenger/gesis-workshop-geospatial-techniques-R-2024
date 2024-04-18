@@ -2,7 +2,7 @@
 title: "Introduction to Geospatial Techniques for Social Scientists in R"
 subtitle: "Spatial Econometrics & Outlook"
 author: "Stefan Jünger & Anne-Kathrin Stroppe"
-date: June 07, 2022
+date: April 24, 2024
 institute: |
   GESIS Workshop
 presenter: Anne
@@ -376,9 +376,9 @@ class: middle
 
 ## Exercise 2_3_2: Spatial Regression
 
-[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/exercises/2_4_1_Spatial_Regression.html)
+[Exercise](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/2_4_1_Spatial_Regression.html)
 
-[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2023/solutions/2_4_1_Spatial_Regression.html)
+[Solution](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/2_4_1_Spatial_Regression.html)
 
 ---
 
