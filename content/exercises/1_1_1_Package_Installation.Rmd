@@ -38,6 +38,7 @@ easypackages::packages(
   "dplyr",
   "ggplot2",
   "ggsn",
+  "gifski",
   "haven",
   "osmdata",
   "OpenStreetMap",

@@ -214,6 +214,7 @@ woRkshoptools::include_picture("fig_3d_.png")
 
 .tinyisher[Sources:  OpenStreetMap / GEOFABRIK (2018), City of Cologne (2014), Leibniz Institute of Ecological Urban and Regional Development (2018), Statistical Offices of the Federation and the Länder (2016), and German Environmental Agency / EIONET Central Data Repository (2016) / Jünger, 2019]
 ]
+
 ---
 
 ## Data Linking
@@ -747,7 +748,7 @@ coordinate_linked_df <-
 
 ---
 
-## Calculate distance
+## Distance Calculation I
 
 To measure access to alternative transportation (e.g. public transport), we want to measure the distance to the closest train station for each respondent. 
 We can get the train station points from OSM.
@@ -789,7 +790,7 @@ nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
 
 ---
 
-## Distance Calculation
+## Distance Calculation II
 
 `sf::st_distance()` will calculate between **all** respondents and **all** train stations resulting in a matrix with 1,786,000 objects (1,000 respondent * 1,786 hospitals). We can make our lives a little bit easier by first identifying the nearest station and then calculate the distance.
 
