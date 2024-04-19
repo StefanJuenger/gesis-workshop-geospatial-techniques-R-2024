@@ -530,8 +530,7 @@ sampling_area_attributes <-
 
 Luckily, we already calculated this yesterday!
 
-```{r access-charging infrastructure}
-
+```{r charger-nrw, echo = FALSE}
 
 charger_nrw <- 
   # Read charging station points datae
@@ -545,6 +544,13 @@ charger_nrw <-
   sf::st_transform(crs = 3035) %>%
   # Subset point data to sampling area
   sf::st_intersection(sampling_area)
+
+
+```
+
+
+
+```{r access-charging infrastructure}
 
 
 sampling_area_attributes <- 
@@ -792,7 +798,7 @@ nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
 
 ## Distance Calculation II
 
-`sf::st_distance()` will calculate between **all** respondents and **all** train stations resulting in a matrix with 1,786,000 objects (1,000 respondent * 1,786 hospitals). We can make our lives a little bit easier by first identifying the nearest station and then calculate the distance.
+`sf::st_distance()` will calculate between **all** respondents and **all** train stations resulting in a matrix with 2,710,000 objects (1,000 respondent * 2,710 stations). We can make our lives a little bit easier by first identifying the nearest station and then calculate the distance.
 
 .pull-left[
 ```{r dist-disp}
