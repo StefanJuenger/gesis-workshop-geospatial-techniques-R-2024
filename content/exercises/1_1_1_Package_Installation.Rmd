@@ -42,7 +42,6 @@ easypackages::packages(
   "haven",
   "osmdata",
   "OpenStreetMap",
-  "reticulate",
   "sf",
   "spatialreg",
   "spatstat",
