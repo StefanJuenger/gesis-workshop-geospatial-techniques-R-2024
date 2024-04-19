@@ -286,25 +286,27 @@ woRkshoptools::include_picture("fig_geometries.png")
 
 ---
 
-## Geospatial Data in This Course I #WIP
+## Geospatial Data in This Course I
 
-In the folder called `./data` in the same folder as the other materials for this workshop, you can find the data files prepped for all the exercises and slides. The following data are included:
+In the folder called `./data` in the same folder as the other materials for this workshop, you can find (most of) the data files prepped for all the exercises and slides. The following data are included:
 
 - Administrative borders of Germany (Prefix *VG250_*) are provided by the German [Federal Agency for Cartography and Geodesy](http://www.bkg.bund.de)(2018). Check out their [Open Data Portal](https://gdz.bkg.bund.de/index.php/default/open-data.html).
 
 - The hospital locations are based on the register of hospitals and preventive care/rehabilitation facilities 2017 published by the [Federal Statistical Office Germany](https://www-genesis.destatis.de/genesis/online). Addresses were geocoded and -referenced by Anne-Kathrin Stroppe. 
 
-- Data on Covid-19 deaths as of July 6th, 2022 were prepared by the Robert-Koch-Institut and downloaded from the [NPGEO data hub](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0).
+- Election Results for the German Right-Wing Populist Party *AfD* in the 2021 German federal election ([Der Bundeswahlleiter, Wiesbaden 2018](https://www.bundeswahlleiter.de/bundestagswahlen/2017/ergebnisse/weitere-ergebnisse.html)).
 
 ---
 
-## Geospatial Data in This Course II #WIP
-
--  Election Results for the German Right-Wing Populist Party *AfD* in the 2021 German federal election ([Der Bundeswahlleiter, Wiesbaden 2018](https://www.bundeswahlleiter.de/bundestagswahlen/2017/ergebnisse/weitere-ergebnisse.html)).
+## Geospatial Data in This Course II
 
 - German Census 2011 data are provided by the [Federal Statistical Office Germany, Wiesbaden 2020](https://www.zensus2011.de/EN/Home/home_node.html)
 
-- Shapefiles, voting data, neighborhood complaints data, and Covid cases for Cologne are gathered from the [Open Data Portal Cologne](https://www.offenedaten-koeln.de/)
+- Shapefiles, voting data, and car-related data for Cologne are gathered from the [Open Data Portal Cologne](https://www.offenedaten-koeln.de/)
+
+- Information about public transport stops and streets are from [OpenStreetMap](https://www.openstreetmap.org/)
+
+- Weather data are gathered from [Climate Data Center of the German Weather Service](https://www.dwd.de/DE/klimaumwelt/cdc/cdc_node.html)
 
 **Please make sure that if you reuse any of the provided data to cite the original data sources.**
 
