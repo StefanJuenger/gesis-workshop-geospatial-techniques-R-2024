@@ -512,7 +512,7 @@ Main Messages
 
 ```{r course-content-7, echo = FALSE}
 course_content %>%
-  kableExtra::row_spec(8, background = "yellow")
+  kableExtra::row_spec(9, background = "yellow")
 ```
 
 ---
