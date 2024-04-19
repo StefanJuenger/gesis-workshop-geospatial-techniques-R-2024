@@ -527,6 +527,129 @@ class: middle
 
 ---
 
+## One Last Important Bit: Geocoding
+
+Geocoding is the conversion of indirect spatial references (e.g., addresses) into direct spatial references (e.g., coordinates)
+
+However, conducting this procedure is a bit tricky (not only in R). Many services are either
+
+- expensive (at least they cost money or have other restrictions)
+- probably not data protection friendly (Hey Google)
+- or both
+
+---
+
+## OSM Is Your Friend
+
+We can use the Nominatim API from OSM for geocoding of at least a couple of addresses
+
+```{r leibniz-addresses}
+library(tibble)
+library(tidygeocoder)
+
+leibniz_addresses <-
+  tibble::tribble(
+    ~street, ~housenumber, ~zip_code, ~place, ~institute,
+    "B 2", "1", "68159", "Mannheim", "GESIS",
+    "Unter Sachsenhausen", "6-8",  "50667", "Köln", "GESIS",
+    "Kellnerweg", "4", "37077", "Göttingen", "DPZ",
+    "Reichsstr.", "4-6", "04109",  "Leipzig", "GWZO",
+    "Schöneckstraße", "6", "79104", "Freiburg", "KIS",
+    "Albert-Einstein-Straße", "29a", "18059", "Rostock", "LIKAT",
+    "L7", "1", "68161", "Mannheim", "ZEW",
+    "Müggelseedamm", "310", "12587", "Berlin", "IGB",
+    "Campus D2", "2", "66123", "Saarbrücken", "INM",
+    "Eberswalder Straße", "84", "15374", "Müncheberg (Mark)", "ZALF"
+  ) |> 
+  dplyr::mutate(whole_address = paste(street, housenumber, zip_code, place))
+```
+
+---
+
+## Run the Geocoding
+
+```{r geocoding}
+leibniz_addresses <-
+  tidygeocoder::geocode(
+    leibniz_addresses,
+    address = whole_address
+  )
+
+leibniz_addresses
+```
+
+---
+
+## Convert To `sf` Object And Plot
+
+.pull-left[
+```{r conversion-and-plot, eval = FALSE}
+leibniz_addresses_sf <-
+  leibniz_addresses |> 
+  dplyr::filter(!is.na(lat)) |> 
+  sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+tmaptools::read_osm(leibniz_addresses_sf, type = "esri-topo") |> 
+  terra::rast() |> 
+  tm_shape() +
+  tm_rgb() +
+  tm_shape(leibniz_addresses_sf) +
+  tm_dots(size = 2, col = "red")
+```
+]
+
+.pull-right[
+```{r conversion-and-plot-exec, echo = FALSE}
+leibniz_addresses_sf <-
+  leibniz_addresses |> 
+  dplyr::filter(!is.na(lat)) |> 
+  sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+tmaptools::read_osm(leibniz_addresses_sf, type = "esri-topo") |> 
+  terra::rast() |> 
+  tm_shape() +
+  tm_rgb() +
+  tm_shape(leibniz_addresses_sf) +
+  tm_dots(size = 2, col = "red")
+```
+]
+
+---
+
+## Our Approach
+
+Different service providers can be used, e.g., Google, Bing, OSM but raises questions of data protection and quality concerns.
+
+We rely on a service offered by the Federal Agency of Cartography and Geodesy (BKG):
+
+- Online interface and API for online geocoding
+- Offline geocoding possible based on raw data
+- But: Data and service are restricted
+
+---
+
+## `bkggeocoder`
+
+.pull-left[
+
+R package `bkggeocoder` developed at GESIS for (offline) geocoding by Stefan and Jonas Lieth:
+
+- Access via [Github](https://github.com/StefanJuenger/bkggeocoder)
+- Introduction in the [Meet the Experts Talk](https://www.youtube.com/watch?v=ZnA21LyKK88&feature=youtu.be) by Stefan
+
+]
+
+.pull-right[
+</br>
+</br>
+```{r pic-bkggeocoding, out.width = "65%", echo = FALSE}
+woRkshoptools::include_picture("bkggeocoder.png")
+```
+]
+
+
+---
+
 class: middle
 
 ## Add-on Slides
