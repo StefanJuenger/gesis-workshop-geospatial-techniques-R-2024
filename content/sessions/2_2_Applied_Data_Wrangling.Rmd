@@ -158,9 +158,98 @@ woRkshoptools::include_picture("fig_linking_workflow_simple.png")
 
 ---
 
-## Geocoding
+---
 
-Indirect spatial references have to be converted into direct spatial references $\rightarrow$ Addresses to geo-coordinates
+## One Last Important Bit: Geocoding
+
+Geocoding is the conversion of indirect spatial references (e.g., addresses) into direct spatial references (e.g., coordinates)
+
+However, conducting this procedure is a bit tricky (not only in R). Many services are either
+
+- expensive (at least they cost money or have other restrictions)
+- probably not data protection friendly (Hey Google)
+- or both
+
+---
+
+## OSM Is Your Friend
+
+We can use the Nominatim API from OSM for geocoding of at least a couple of addresses
+
+```{r leibniz-addresses}
+library(tibble)
+library(tidygeocoder)
+
+leibniz_addresses <-
+  tibble::tribble(
+    ~street, ~housenumber, ~zip_code, ~place, ~institute,
+    "B 2", "1", "68159", "Mannheim", "GESIS",
+    "Unter Sachsenhausen", "6-8",  "50667", "Köln", "GESIS",
+    "Kellnerweg", "4", "37077", "Göttingen", "DPZ",
+    "Reichsstr.", "4-6", "04109",  "Leipzig", "GWZO",
+    "Schöneckstraße", "6", "79104", "Freiburg", "KIS",
+    "Albert-Einstein-Straße", "29a", "18059", "Rostock", "LIKAT",
+    "L7", "1", "68161", "Mannheim", "ZEW",
+    "Müggelseedamm", "310", "12587", "Berlin", "IGB",
+    "Campus D2", "2", "66123", "Saarbrücken", "INM",
+    "Eberswalder Straße", "84", "15374", "Müncheberg (Mark)", "ZALF"
+  ) |> 
+  dplyr::mutate(whole_address = paste(street, housenumber, zip_code, place))
+```
+
+---
+
+## Run the Geocoding
+
+```{r geocoding}
+leibniz_addresses <-
+  tidygeocoder::geocode(
+    leibniz_addresses,
+    address = whole_address
+  )
+
+leibniz_addresses
+```
+
+---
+
+## Convert To `sf` Object And Plot
+
+.pull-left[
+```{r conversion-and-plot, eval = FALSE}
+leibniz_addresses_sf <-
+  leibniz_addresses |> 
+  dplyr::filter(!is.na(lat)) |> 
+  sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+tmaptools::read_osm(leibniz_addresses_sf, type = "esri-topo") |> 
+  terra::rast() |> 
+  tm_shape() +
+  tm_rgb() +
+  tm_shape(leibniz_addresses_sf) +
+  tm_dots(size = 2, col = "red")
+```
+]
+
+.pull-right[
+```{r conversion-and-plot-exec, echo = FALSE}
+leibniz_addresses_sf <-
+  leibniz_addresses |> 
+  dplyr::filter(!is.na(lat)) |> 
+  sf::st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+tmaptools::read_osm(leibniz_addresses_sf, type = "esri-topo") |> 
+  terra::rast() |> 
+  tm_shape() +
+  tm_rgb() +
+  tm_shape(leibniz_addresses_sf) +
+  tm_dots(size = 2, col = "red")
+```
+]
+
+---
+
+## Our Approach
 
 Different service providers can be used, e.g., Google, Bing, OSM but raises questions of data protection and quality concerns.
 
@@ -191,7 +280,7 @@ woRkshoptools::include_picture("bkggeocoder.png")
 ```
 ]
 
----
+
 
 
 ## Spatial Linking
@@ -715,30 +804,30 @@ head(district_linked_df, 5)
 
 ## Too boring? Let's scale it down!
 
-We have our nice fake coordinates and we do know that we also have variation within some districts (E.g. cologne), concerning e-car mobility.
+We have our nice fake coordinates and we do know that we also have variation within some districts (E.g. Cologne), concerning e-car mobility.
 So let's try to operationalize the variables on a smaller level of aggregation.
 
 *Access to charging infrastructure*
-> Charging stations in a 2000m buffer
+> Charging stations in a 5000m buffer
 
 *Alternative means of transport*
 > Distance to closest train stop
 
 *Rural-urban divide*
-> Population in a 2000m buffer 
+> Population in a 5000m buffer 
 
 ---
 
-## Charging stations in 2000m buffer
+## Charging stations in 5000m Buffer
 
-To calculate the number of chargers in a 2km buffer, the procedure is very similar to calculating the buffers in a district.
+To calculate the number of chargers in a 5km buffer, the procedure is very similar to calculating the buffers in a district.
 
 ```{r charging-stations}
 
-# Create 2000m buffers around the fake coordinates
+# Create 5000m buffers around the fake coordinates
 buffers <- 
   fake_coordinates %>%
-  sf::st_buffer(dist = 2000)
+  sf::st_buffer(dist = 5000)
 
 # Perform intersection between buffers and points_sf
 inter <- 
@@ -837,7 +926,7 @@ summary(coordinate_linked_df$dist_km)
 
 ## Population Buffers
 
-...and we're not yet done: we still need the population in the neighborhood. Let's calculate buffers of 2000 meters and add the population mean values to our dataset.
+...and we're not yet done: we still need the population in the neighborhood. Let's calculate buffers of 5000 meters and add the population mean values to our dataset.
 
 ```{r raster-buffer-link}
 
@@ -852,7 +941,7 @@ population_buffers <-
   terra::extract(
     inhabitants_nrw, 
     fake_coordinates %>% 
-      sf::st_buffer(2000) %>% 
+      sf::st_buffer(5000) %>% 
       terra::vect(), 
     fun = mean,
     na.rm = TRUE

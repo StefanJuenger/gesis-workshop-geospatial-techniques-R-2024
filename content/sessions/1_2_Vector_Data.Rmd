@@ -415,6 +415,7 @@ german_districts
 plot(german_districts)
 ```
 ]
+
 ---
 
 ## Data Intro: Attributes
@@ -535,6 +536,7 @@ cologne <-
 plot(cologne)
 ```
 ]
+
 ---
 
 ## Using `sf` for subsetting
@@ -678,6 +680,7 @@ class: middle
 .center[
 But, that is for after lunch!
 ]
+
 ---
 
 ```{r child = "./content/config/sessions_end.Rmd"}

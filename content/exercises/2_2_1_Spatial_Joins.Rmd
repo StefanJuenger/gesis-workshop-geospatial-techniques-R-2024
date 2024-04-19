@@ -37,16 +37,11 @@ You need two datasets for that: the point layer `charging_points_ger.csv` (remem
 ```{block, opts.label = "clues"}
 
 There are two functions you can explore: `sf::st_join` and `sf::st_intersection()`.
-The default of `sf::st_join()` will leave you with a 'left-join' and returns a data object with all hospitals and matching district information for those which are located within NRW. You can reset the option to perform an 'inner-join' and keep only the observation which lay within the predefined area (`sf::st_join(x , y, join  = "", left = FALSE)`).
+The default of `sf::st_join()` will leave you with a 'left-join' and returns a data object with all chargers and matching district information for those which are located within NRW. You can reset the option to perform an 'inner-join' and keep only the observation which lay within the predefined area (`sf::st_join(x , y, join  = "", left = FALSE)`).
 
 ```
 
 ```{r first, solution = TRUE}
-
-library(dplyr)
-library(readr)
-library(sf)
-library(osm)
 
 # load charger
 charger_ger <- 
@@ -86,13 +81,13 @@ charger_nrw <-
     # chose intersect or within
     join = sf::st_intersects,
     # option FALSE will 
-    # keep only the hospital 
+    # keep only the chargers 
     # which could be joined
     left = FALSE
   )
  
 nrow(charger_nrw)
-# 11081 hospitals in NRW
+# 11081 chargers in NRW
 
 
 ```
@@ -100,53 +95,161 @@ nrow(charger_nrw)
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
 
-Did the operationalization of health care provision convince you? Don't you think it might be more important how many hospitals are close to survey respondents?
-To test this, we want to calculate the number of hospitals (and/or hospital beds) per district in North-Rhine Westphalia.
+
+Did the operationalization of train station accessbility convince you? The INKAR data base offers another approach: Proportion of residents with max. 1000m linear distance to the nearest public transport stop in the district. 
+We do have everything to create this indicator on the smaller scale as well.
+What is the mean share of residents with max. 1000m linear distance to the nearest train station in a 5km neighbourhood of our fake respondents?
+
+You can run the code below to load all the data you need.
+
+```
+
+
+```{r compile-data, include = FALSE}
+
+nrw <-
+  osmdata::getbb(
+    "Nordrhein-Westfalen", 
+    format_out = "sf_polygon"
+  ) %>% 
+  .$multipolygon %>% 
+  sf::st_transform(3035) 
+
+set.seed(1234)
+
+fake_coordinates <-
+  sf::st_sample(nrw, 1000) %>% 
+  sf::st_sf() %>% 
+  dplyr::mutate(
+    id_2 = 
+      stringi::stri_rand_strings(10000, 10) %>% 
+      sample(1000, replace = FALSE)
+  )
+
+nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
+
+inhabitants_ger <-
+  z11::z11_get_100m_attribute(Einwohner) 
+
+```
+
+```{r compile-data-show, eval = FALSE}
+
+nrw <-
+  osmdata::getbb(
+    "Nordrhein-Westfalen", 
+    format_out = "sf_polygon"
+  ) %>% 
+  .$multipolygon %>% 
+  sf::st_transform(3035) 
+
+set.seed(1234)
+
+fake_coordinates <-
+  sf::st_sample(nrw, 1000) %>% 
+  sf::st_sf() %>% 
+  dplyr::mutate(
+    id_2 = 
+      stringi::stri_rand_strings(10000, 10) %>% 
+      sample(1000, replace = FALSE)
+  )
+
+nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
+
+inhabitants_ger <-
+  z11::z11_get_100m_attribute(Einwohner) 
+
 
 ```
 
 ```{block, opts.label = "clues"}
-You need a `dplyr::as_tibble()` data frame to use the functions `dplyr::group_by()` and `dplyr::summarise()`.
+As always, there are several ways to do this. Anne tried to keep the workflow as close to the functions taught in this course and suggests following steps:
+
+1. Create a point layer with the centroids of all grids  in NRW based on the z11 population layer.
+
+2. Calculate the distance to the next train station for each grid.
+
+3. Create a column that equals 0 if the distance to the next train station is >1000m and contains the number of inhabitants if <1000.
+
+4. Rasterize the sf data object to receive two raster object: number of inhabitants and number of inhabitants with max 1000m distance to next train station.
+
+5. Calculate the mean for the 5km buffer for each "respondent" for each raster.
+
+6. Calculate the share.
+
 ```
 
 ```{block, opts.label = "clues"}
-The function `dplyr::n()` allows summarizing the total count of hospitals. `sum(beds)` for summarizing the bed total per district.
+In the add-on slides of the raster session Stefan introduced gave some information on how to transform raster to points (and back). To get a `sf` point layer of the raster object you can use `terra::as.points() %>% sf::st_as_sf()`. 
+To rasterize the object, you can use `terra::rast(vals = .$colname, resolution = 100)`.
 ```
 
 ```{r second, solution = TRUE}
 
-nrw_districts <- 
-  sf::read_sf("./data/VG250_KRS.shp") %>% 
-  sf::st_transform(3035) %>% 
-  sf::st_join(nrw, join = sf::st_intersects, left = FALSE)
+# Extract inhabitants points for North Rhine-Westphalia (NRW)
+nrw_pt_inhabitants <- 
+  inhabitants_ger %>% 
+  terra::crop(., nrw) %>% 
+  # convert to points
+  terra::as.points() %>%   
+  # convert to sf object
+  sf::st_as_sf() 
 
-nrw_hospitals <-  
-  nrw_hospitals %>% 
-  # beds were character, now numeric
-  dplyr::mutate(beds = as.numeric(beds)) %>%
-  # replace NAs as zeros for simplification
-  replace(is.na(.), 0)
+# Find the nearest train station for each grid centroid
+nearest_station <- 
+  sf::st_nearest_feature(nrw_pt_inhabitants, nrw_pt_trainstops)
+
+# Calculate distances from inhabitants to the nearest train station
+distances <- sf::st_distance(nrw_pt_inhabitants, 
+                             nrw_pt_trainstops[nearest_station,], 
+                             by_element = TRUE) 
+
+# Create a raster representing population with train access within 1000m for NRW 
+nrw_rast_inhabitants_access <- 
+  nrw_pt_inhabitants %>% 
+  dplyr::mutate(train_access = ifelse(as.numeric(distances) <= 1000, lyr.1, 0)) %>% 
+  terra::rast(vals = .$train_access, resolution = 100) 
+
+# Create a raster representing population  for NRW
+# NOTE: You could also use the 'old' raster. However, by converting the
+# data the extent of the raster layer might not fit anymore and needs adjustments.
+nrw_rast_inhabitants <- 
+  nrw_pt_inhabitants %>% 
+  terra::rast(vals = .$lyr.1, resolution = 100) 
+
+# Extract population within 5km buffers around each respondent
+population_buffers <- 
+  terra::extract(
+    nrw_rast_inhabitants, 
+    fake_coordinates %>% 
+      sf::st_buffer(5000) %>% 
+      terra::vect(), 
+    fun = mean,
+    na.rm = TRUE
+  )
+
+# Extract population within 5km buffers considering train access within 1000m
+population_access_buffers <- terra::extract(
+  nrw_rast_inhabitants_access, 
+  fake_coordinates %>% 
+    sf::st_buffer(5000) %>% 
+    terra::vect(), 
+  fun = mean,
+  na.rm = TRUE
+)
+
+# Combine population data with train access information
+linked_df <- 
+  fake_coordinates %>% 
+  dplyr::mutate(
+    population = population_buffers[[2]],
+    population_trainaccess = population_access_buffers[[2]],
+    share_access = population_access_buffers[[2]] / population_buffers[[2]]
+)
+
+# Summary of the new data
+summary(linked_df)
 
 
-district_hospital_join <-
-  nrw_hospitals %>% 
-  # join the hospitals 
-  # within districts
-  sf::st_join(nrw_districts, join = sf::st_within) %>% 
-  # use as tibble to perform
-  # group by & summarise
-  dplyr::as_tibble() %>% 
-  dplyr::group_by(AGS) %>% 
-  dplyr::summarise(
-    hospital_count = dplyr::n(), 
-    hospital_bed_count = sum(as.numeric(beds))
-  ) %>% 
-  # left join the new information
-  # to the original data frame
-  dplyr::left_join(nrw_districts, .) %>% 
-  # select only usefull columns
-  dplyr::select(AGS, hospital_count, hospital_bed_count)
-
-summary(district_hospital_join )
 ```
 
