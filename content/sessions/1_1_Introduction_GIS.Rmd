@@ -9,7 +9,7 @@ presenter: Stefan
 --- 
 layout: true
 
-```{r child = "./config/sessions_setup.Rmd"}
+```{r child = "./content/config/sessions_setup.Rmd"}
 ```
 
 ---
@@ -33,7 +33,6 @@ By the end of this course, you should...
 woRkshoptools::include_picture("r_first_then.png") 
 ```
 <small><small>Illustration by [Allison Horst](https://github.com/allisonhorst/stats-illustrations) </small></small> 
-
 
 ---
 
@@ -192,6 +191,16 @@ woRkshoptools::include_picture("siegfried.png")
 
 ---
 
+## The Chicago School!
+
+
+```{r park-etal-pic, echo = FALSE, out.width = "50%"}
+woRkshoptools::include_picture("park_etal.png")
+```
+.tinyisher[Park et al. 1925]
+
+---
+
 ## Integration in Theory
 
 .pull-left[
@@ -209,13 +218,27 @@ For example, in Allport's (1954) contact theory, he at least implicitly assumes 
 
 ---
 
-## And another example
+## Still relevant today
 
+So many studies still rely on these ideas but incorperate space directly, e.g.,
 
-```{r park-etal-pic, echo = FALSE, out.width = "50%"}
-woRkshoptools::include_picture("park_etal.png")
+.pull-left[
+.tinyisher[
+- Iyer, A., & Pryce, G. (2023). Theorising the causal impacts of social frontiers: The social and psychological implications of discontinuities in the geography of residential mix. Urban Studies, 00420980231194834. https://doi.org/10.1177/00420980231194834
+- Kent, J. (2022). Can urban fabric encourage tolerance? Evidence that the structure of cities influences attitudes toward migrants in Europe. Cities, 121, 103494. https://doi.org/10.1016/j.cities.2021.103494
+- Schmidt, K., Jacobsen, J., & Iglauer, T. (2023). Proximity to refugee accommodations does not affect locals’ attitudes toward refugees: Evidence from Germany. European Sociological Review, jcad028. https://doi.org/10.1093/esr/jcad028
+- Xu, A. Z. (2023). Segregation and the Spatial Externalities of Inequality: A Theory of Interdependence and Public Goods in Cities. American Political Science Review, 1–18. https://doi.org/10.1017/S0003055423000722
+- ...
+- Jünger, S., & Schaeffer, M. (2023). Ethnic Diversity and Social Integration—What are the Consequences of Ethnic Residential Boundaries and Halos for Social Integration in Germany? KZfSS Kölner Zeitschrift Für Soziologie Und Sozialpsychologie. https://doi.org/10.1007/s11577-023-00888-1
+]
+]
+
+.pull-right[
+```{r pic-xu, echo = FALSE, out.width = "60%"}
+woRkshoptools::include_picture("/xu2023.png")
 ```
-.tinyisher[Park et al. 1925]
+.center[.tinyisher[Xu 2023]]
+]
 
 ---
 
@@ -351,13 +374,14 @@ woRkshoptools::include_picture("fig_projections.png")
 
 ## Types of CRS
 
-**Geographic CRS**
-- span the entire earth
+Differentiating between different CRS is wild (at least for me...). In your research, you may hear from geographic, geocentric, projected, or local CRS.
 
-**Projected CRS**
-- projection of specific geometries on a (flat) surface
+What's the difference?
 
-(There are also geocentric CRS requiring a z-coordinate...)
+- whether 2 dimensional (longitude, latitude) or 3 dimensional (+height) coordinates are used
+- the location of the coordinate system's origin (center of earth or not)
+- projection on flat surface (transformation of longitudes and latitudes to x and y coordinates)
+- location (the smaller the more precise are projections)
 
 *In practice, you shouldn't worry too much about CRS. Again, what matters is that they match.*
 
@@ -455,7 +479,6 @@ woRkshoptools::include_picture("Raster-and-Vector-data-types-as-representative-o
 
 .tinyisher[.center[[Source](https://dx.doi.org/10.13140/2.1.3030.1767)]]
 
-
 ---
 
 ## Packages in This Course
@@ -468,7 +491,6 @@ We will use plenty of different packages during the course, but only a few are o
 - [`haven`](https://cran.r-project.org/web/packages/haven/index.html)
 - [`osmdata`](https://cran.r-project.org/web/packages/osmdata/index.html)
 - [`OpenStreetMap`](https://cran.r-project.org/web/packages/OpenStreetMap/index.html)
-- [`reticulate`](https://cran.r-project.org/web/packages/reticulate/index.html) (optional)
 - [`sf`](https://cran.r-project.org/web/packages/sf/index.html)
 - [`spatialreg`](https://cran.r-project.org/web/packages/spatialreg/index.html)
 ]
@@ -477,7 +499,6 @@ We will use plenty of different packages during the course, but only a few are o
 - [`spatstat`](https://cran.r-project.org/web/packages/spatstat/index.html)
 - [`sfdep`](https://cran.r-project.org/web/packages/sfdep/index.html)
 - [`spdep`](https://cran.r-project.org/web/packages/spdep/index.html)
-- [`stars`](https://cran.r-project.org/web/packages/stars/index.html)
 - [`terra`](https://cran.r-project.org/web/packages/terra/index.html)
 - [`tmap`](https://cran.r-project.org/web/packages/tmap/index.html)
 - [`tmaptools`](https://cran.r-project.org/web/packages/tmaptools/index.html)
