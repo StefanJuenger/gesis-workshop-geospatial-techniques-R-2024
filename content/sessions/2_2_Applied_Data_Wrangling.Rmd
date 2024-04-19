@@ -65,7 +65,7 @@ woRkshoptools::include_picture("geo_surveys.png")
 From the addresses to analyses with georeferenced survey data, several steps and challenges along the way. We will talk about:
 
 - Data Protection & Data Access
-- Geocoding
+- Geocoding 
 - Spatial Data Linking
 - Applied Examples
 ]

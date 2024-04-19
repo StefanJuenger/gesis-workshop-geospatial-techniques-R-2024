@@ -94,7 +94,7 @@ cologne_sur_enhanced  <-
     crs = 4326
   ) %>% 
   sf::st_transform(. , crs = 3035) %>% 
-  sf::st_join(., cologne_sur, join = st_within) %>% 
+  sf::st_join(., cologne_sur, join = sf::st_within) %>% 
   dplyr::group_by(district_id) %>%
   dplyr::summarise(charger_count = n()) %>% 
   sf::st_drop_geometry() %>% 

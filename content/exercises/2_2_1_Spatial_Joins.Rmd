@@ -23,32 +23,42 @@ klippy::klippy()
 
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-In the addon of the session, we calculated the distances to the closest hospitals located within North-Rhine Westphalia (NRW). Still, we did not show how to subset the original file, which contains all hospitals in Germany.
+In the addon of the session, we counted the charging stations located within North-Rhine Westphalia (NRW). Still, we did not show how to get a point layer of NRW charging stations ("charger_nrw").
 
-Subset the data file yourself by relying on the spatial information of the file `hospital_points.csv` and a polygon of NRW only.
-How many hospitals are located within the borders of NRW?
+Subset the data file yourself by relying on the spatial information of the file `charging_points_ger.csv` and a polygon of NRW. 
+There are two ways to achieve this.
+How many chargers are located within NRW?
 ```
 
 ```{block, opts.label = "clues"}
-You need two datasets for that: the point layer `hospital_points.csv` in the `./data` folder and polygons of NRW. For the latter, you can again use the `osmdata` syntax.
+You need two datasets for that: the point layer `charging_points_ger.csv` (remember to adjust the crs) in the `./data` folder and polygons of NRW. For the latter, you can again use the `osmdata` syntax.
 ```
 
 ```{block, opts.label = "clues"}
 
+There are two functions you can explore: `sf::st_join` and `sf::st_intersection()`.
 The default of `sf::st_join()` will leave you with a 'left-join' and returns a data object with all hospitals and matching district information for those which are located within NRW. You can reset the option to perform an 'inner-join' and keep only the observation which lay within the predefined area (`sf::st_join(x , y, join  = "", left = FALSE)`).
 
 ```
 
 ```{r first, solution = TRUE}
-# load hospitals
-hospitals <- 
-  read.csv(
-    "./data/hospital_points.csv", 
-    header = TRUE, 
-    fill = TRUE, 
-    sep = ","
-  ) %>%
-  sf::st_as_sf(coords = c("X", "Y"), crs = 3035)
+
+library(dplyr)
+library(readr)
+library(sf)
+library(osm)
+
+# load charger
+charger_ger <- 
+  # Read charging station points datae
+  readr::read_delim("./data/charging_points_ger.csv", 
+                                 delim = ";") %>%
+  # Filter out rows with missing longitude or latitude
+  dplyr::filter(!is.na(longitude) & !is.na(latitude)) %>%
+  # Convert data frame to sf object
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+  # Reproject the spatial data to the desired CRS (Coordinate Reference System)
+  sf::st_transform(crs = 3035) 
 
 
 #  use the OSM function
@@ -60,9 +70,16 @@ nrw <-
   .$multipolygon %>% 
   sf::st_transform(3035)
 
+# option 1
+charger_nrw <- 
+  charger_ger %>% 
+  # Subset point data to sampling area
+  sf::st_intersection(nrw)
+
+# option 2
 # spatial join
-nrw_hospitals <-
-  hospitals %>% 
+charger_nrw <-
+  charger_ger %>%  
   sf::st_join(
     # point layer nrw
     nrw, 
@@ -73,9 +90,11 @@ nrw_hospitals <-
     # which could be joined
     left = FALSE
   )
+ 
+nrow(charger_nrw)
+# 11081 hospitals in NRW
 
-nrow(nrw_hospitals)
-# 344 hospitals in NRW
+
 ```
 
 
