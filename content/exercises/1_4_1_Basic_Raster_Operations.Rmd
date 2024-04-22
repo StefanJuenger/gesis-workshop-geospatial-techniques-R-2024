@@ -20,11 +20,11 @@ klippy::klippy()
 ```
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-Create a matrix with 8 rows and 8 columns filled with random numbers in a range between 1 and 1000.
+Create a matrix with 8 rows and 8 columns filled with random numbers between 1 and 1000.
 ```
 
 ```{block, opts.label = "clues"}
-You can use the `sample()` function to create the numbers.
+You can create the numbers using the `sample()` function.
 ```
 
 ```{r first, solution = TRUE}
@@ -39,7 +39,7 @@ fancy_matrix
 
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-Now use this matrix to create a raster layer and plot it.
+Now, use this matrix to create a raster layer and plot it.
 ```
 
 ```{block, opts.label = "clues"}

@@ -24,7 +24,7 @@ Sample 50 points that fall within the boundaries of the city of Cologne. You wil
 ```
 
 ```{block, opts.label = "clues"}
-The shapefile is no raster file, so that you would need the `sf::read_sf()` function to load the data. Sampling is straightforward: Apply the `sf::st_sample` to the loaded shapefile, but make sure to apply the `sf::st_as_sf()` function afterward to receive a full-fledged data table (with a geometry column only).
+The shapefile is not a raster file, so you need the `sf::read_sf()` function to load the data. Sampling is straightforward: Apply the `sf::st_sample` to the loaded shapefile, but make sure to apply the `sf::st_as_sf()` function afterward to receive a full-fledged data table (with a geometry column only).
 ```
 
 ```{r first, solution = TRUE}
@@ -60,7 +60,7 @@ Extract the immigrant rate value at each position of the previously sampled poin
 ```
 
 ```{block, opts.label = "clues"}
-Remember that the German Census 2011 data are relatively sparse due to some severe data protection measures.
+Remember that the German Census 2011 data could be more sparse due to some severe data protection measures.
 ```
 
 ```{r third, solution = TRUE}
@@ -72,11 +72,11 @@ immigrant_rates_at_point
 ```
 
 ```{block, box.title = "4", box.body = list(fill = "white"), box.icon = "fa-star"}
-Use an adequate method of raster extraction to gather information in the geographic surrounding of a point. What is your observation now?
+Use an adequate method of raster extraction to gather information in the geographic surroundings of a point. What is your observation now?
 ```
 
 ```{block, opts.label = "clues"}
-Assume that people move in a 1,000 meters radius around their location. Thus, extracting information on buffers of 1,000 meters around the points might be interesting using the option `sf::st_buffer()` function. In that case, you should also set a descriptive statistics function, e.g., with the option `fun = mean` and its helpful companion option to consider missing values `na.rm = TRUE`. 
+Assume that people move in a 1,000-meter radius around their location. Thus, extracting information on buffers of 1,000 meters around the points might be interesting using the option `sf::st_buffer()` function. In that case, you should also set a descriptive statistics function, e.g., with the option `fun = mean` and its helpful companion option to consider missing values `na.rm = TRUE`. 
 ```
 
 ```{r fourth, solution = TRUE}
