@@ -8,3 +8,4 @@ content/img/*.pptx
 content/sessions/tmp.R
 participant_materials/districts*
 *.Rproj
+./data/lyr.1.asc

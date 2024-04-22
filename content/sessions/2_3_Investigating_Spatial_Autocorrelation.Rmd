@@ -50,6 +50,8 @@ This means nearby geographical regions, institutions, or people are more similar
 
 **What we get is an interdependent system.**
 
+.tinyisher[Tobler, W. R. (1970). A Computer Movie Simulating Urban Growth in the Detroit Region. Economic Geography, 46, 234–240. https://doi.org/10.2307/143141]
+
 ---
 
 ## Spatial Interdependence or Autocorrelation
@@ -455,7 +457,7 @@ Moran's I is a global statistic for spatial autocorrelation. It can produce issu
 
 $$C=\frac{(N-1)\sum_i\sum_jw_{ij}(x_i-x_j)^2}{2\sum_{i=1}^N\sum_{j=1}^Nw_{ij}\sum_i(x_i-\bar{x})^2}$$
 
-As you can see, in the numerator, the average value $\bar{x}$ is not as prominent as in Moran's I. Geary's C only produces values between 0 and 2 (value near 0 = positive spatial autocorrelation; 1 = no spatial autocorelation; values near 2 = negative spatial autocorrelation)
+As you can see, in the numerator, the average value $\bar{x}$ is not as prominent as in Moran's I. Geary's C only produces values between 0 and 2 (value near 0 = positive spatial autocorrelation; 1 = no spatial autocorrelation; values near 2 = negative spatial autocorrelation).
 
 ---
 
@@ -612,18 +614,18 @@ tm_shape(lisa_bivariate) +
 ## Wrap up
 
 You now know how to
-- model connectiveness of spatial units
+- model connectedness of spatial units
 - investigate spatial autocorrelation
   - globally
   - locally
 - map it
   
-There's way more, particularly, when it comes to
+There's way more, particularly when it comes to
 - spatial weights (see exercise)
 - clustering techniques (e.g., Hot Spot Analysis)
 - autocorrelation with more than one or two variables
 
-**Now we know our data are spatially autocorrelated. Let's try to find our why this is the case via some spatial econometrics**
+**Now we know our data are spatially autocorrelated. Let's try to find out why this is the case via some spatial econometrics**
 
 ---
 

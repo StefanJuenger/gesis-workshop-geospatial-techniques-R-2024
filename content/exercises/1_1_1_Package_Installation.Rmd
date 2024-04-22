@@ -26,7 +26,7 @@ As this is the very first exercise in this workshop, it is relatively easy and s
 And here comes our very first exercise (which is not very spatial...):
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-Please install all packages that are listed on slide 29 of the Introduction slides ("1_Introduction_GIS.html").
+Please install all packages that are listed on slide 31 of the Introduction slides ("1_Introduction_GIS.html").
 ```
 
 ```{block, opts.label = "clues"}
@@ -37,7 +37,7 @@ I always recommend using the `easypackages` packages, which can be installed wit
 easypackages::packages(
   "dplyr",
   "ggplot2",
-  "ggsn",
+  "oswaldosantos/ggsn",
   "gifski",
   "haven",
   "osmdata",
@@ -49,6 +49,7 @@ easypackages::packages(
   "spdep",
   "stars",
   "terra",
+  "tidygeocoder",
   "tmap",
   "tmaptools",
   "raster",
