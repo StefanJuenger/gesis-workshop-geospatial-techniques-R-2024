@@ -21,7 +21,7 @@ knitr::opts_template$set(
 klippy::klippy()
 ```
 
-Alright, thus far, we have only used Queen neighborhood matrices with our data. Let's use this exercise to try out different variations. First of all, run the code below in order to compile the data that were also used in the lecture.
+Thus far, we have only used Queen neighborhood matrices with our data. Let's use this exercise to try out different variations. First of all, run the code below to compile the data that were also used in the lecture.
 
 ```{r compile-data, echo = FALSE}
 voting_districts <-
@@ -122,11 +122,11 @@ election_results <-
 ```
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-As in the lecture, create a neighborhood (weight) matrix, but this time do it for Queen and Rook neighborhoods. Also, apply a row-normalization.
+As in the lecture, create a neighborhood (weight) matrix, but this time, do it for Queen and Rook neighborhoods. Also, apply a row normalization.
 ```
 
 ```{block, opts.label = "clues"}
-You could either use the `sdep` package with its function `spdep::poly2nb()` or the more modern approach of the `sfdep` package using the function `sfdep::st_contiguity()`. In both cases, for Rook neighborhoods, you have to set the option `queen = FALSE`.
+You could either use the `sdep` package with its function `spdep::poly2nb()` or the more modern approach of the `sfdep` package using the function `sfdep::st_contiguity()`. In both cases, you have to set the option `queen = FALSE` for Rook neighborhoods.
 ```
 
 ```{r first, solution = TRUE}
@@ -159,9 +159,9 @@ election_results <-
 ```
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-We have not used them, but you can also create distance-based weight matrices. Use again the package of your choice and create weights for a distance between 0 and 5000 meters. Use again row-normalization.
+We have not used them, but you can also create distance-based weight matrices. Use the package of your choice again and create weights for a distance between 0 and 5000 meters. Use again row-normalization.
 
-For the purpose of this exercise, you also have to convert the polygon data to point coordinates. I'd propose to use the centroids for this task:
+You must also convert the polygon data to point coordinates for this exercise. We'd propose to use the centroids for this task:
 
 `election_results_centroids <- sf::st_centroid(election_results)`
 
@@ -169,7 +169,7 @@ Use a map to corroborate this conversion was successful.
 ```
 
 ```{block, opts.label = "clues"}
-If you use `spdep` use the function `spdep::dnearneigh()` and if you use `sfdep` use the function `sfdep::st_dist_band()`.
+If you use `spdep`, use the function `spdep::dnearneigh()`; if you use `sfdep`, use the function `sfdep::st_dist_band()`.
 ```
 
 ```{r second, solution = TRUE}
@@ -196,11 +196,11 @@ election_results_centroids <-
 ```
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-Now let's see how all of these different spatial weights perform in an actual analysis. Calculate Moran's I and Geary's C for each one of the weights and report their results for the variable `afd_share`.
+Now, let's see how these different spatial weights perform in an analysis. Calculate Moran's I and Geary's C for each one of the weights and report their results for the variable `afd_share`.
 ```
 
 ```{block, opts.label = "clues"}
-Now it is really important which path you have taken before -- using `spdep` and `sfdep` -- as it determines the way how you solve this exercise.
+It is essential to which path you have taken before -- using `spdep` and `sfdep` -- as it determines how you solve this exercise.
 ```
 
 ```{r third, solution = TRUE}
