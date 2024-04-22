@@ -54,7 +54,7 @@ fancy_raster_layer <- terra::rast(fancy_matrix)
 terra::plot(fancy_raster_layer)
 ```
 
-The `terra::rast()` function can not only be used to create raster data on the fly, which is also not very interesting. Instead, we can use it to import already prepared data.
+The `terra::rast()` function can not only be used to create raster data on the fly, which is also quite boring. Instead, we can use it to import already prepared data.
 
 ```{block, box.title = "3", box.body = list(fill = "white"), box.icon = "fa-star"}
 Import one of the raster `.tiff`  files in the `./data` folder of the workshop directory.
