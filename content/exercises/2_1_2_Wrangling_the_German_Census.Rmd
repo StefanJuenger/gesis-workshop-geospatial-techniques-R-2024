@@ -25,11 +25,11 @@ klippy::klippy()
 
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-Download the 1 km² attribute for the German Census 2011 immigrant rate, which has the German name `Auslaender_A`. Then download the data for the vacany rate (German name: `Leerstandsquote`) in the same raster resolution. Make sure to properly define missing values.
+Download the 1 km² attribute for the German Census 2011 immigrant rate, which has the German name `Auslaender_A`. Then, download the data for the vacancy rate (German name: `Leerstandsquote`) using the same raster resolution. Make sure to properly define missing values.
 ```
 
 ```{block, opts.label = "clues"}
-The function for downloading is `z11::z11_get_1km_attribute()` and the one for listing all attributes of this size `z11::z11_list_1km_attributes()`. There you can also see both of the layer names.
+The function for downloading is `z11::z11_get_1km_attribute()`, and the one for listing all attributes of this size is `z11::z11_list_1km_attributes()`. There, you can also see both of the layer names.
 ```
 
 ```{r first, solution = TRUE}
@@ -47,11 +47,11 @@ vacany_rate_1km
 
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-Crop both datasets to the extent of the city of Berlin.
+Crop both datasets to the extent of Berlin (or any other big German city if you want to).
 ```
 
 ```{block, opts.label = "clues"}
-You can use the `osmdata:getbb()` function and the argument `format_out = "sf_polygon"` to receive a proper polygon for this purpose. Make sure only to extract the `multipolygon` and to convert it to `EPSG:3035`.
+You can use the `osmdata:getbb()` function and the argument `format_out = "sf_polygon"` to receive a proper polygon for this purpose. Make sure only to extract the `multipolygon` and convert it to `EPSG:3035`.
 ```
 
 ```{r second, solution = TRUE}
@@ -99,6 +99,6 @@ tmap_arrange(
     tm_layout(title = "Vacancies"),
   tm_shape(pseudo_heatmap) +
     tm_raster(palette = "-viridis", title = "") +
-    tm_layout(title = "Immigrants + Vacancies")
+    tm_layout(title = "Immigrants X Vacancies")
 )
 ```
