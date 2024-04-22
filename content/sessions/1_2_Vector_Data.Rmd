@@ -27,10 +27,10 @@ course_content %>%
 
 ## Why care about data types and formats?
 
-There is a difference in how spatial information is stored, processed, and visually represented.
-- Different commands to import and handle the data
-- Spatial linking techniques and analyses partially determined by the data format
-- Visualization of data can differ
+There are differences in the way spatial information is stored, processed, and visually represented.
+- Different commands for data import and manipulation
+- Spatial linking techniques and analyses partly determined by data format
+- Visualization of data can vary
 
 So: Always know what kind of data you are dealing with!
 
@@ -54,17 +54,17 @@ tm_shape(World) +
 .pull-right[
 The surface of the earth is represented by simple geometries and attributes.
 
-Every object is defined by longitude (x) and latitude (y) values.
+Each object is defined by longitude (x) and latitude (y) values.
 ]
 
 ---
 
 ## Vector data: Geometries
 .pull-left[
-Each real-world feature is one of three types of geometries:
+Every real-world feature is one of three types of geometry:
 - Points: discrete location (e.g., city)
 - Lines: linear feature (e.g., river)
-- Polygons: enclosed area  (e.g, country, administrative borders)
+- Polygons: enclosed area  (e.g, country, administrative boundaries)
 ]
 
 .pull-right[
@@ -72,7 +72,7 @@ Each real-world feature is one of three types of geometries:
 woRkshoptools::include_picture("vector_geometries.png")
 ```
 <br>
-<small><small><small> National Ecological Observatory Network (NEON), cited by [Datacarpentry](https://datacarpentry.org/organization-geospatial/02-intro-vector-data/)</small></small></small>
+<small><small><small> National Ecological Observatory Network (NEON), cited by [Datacarpentry](https://datacarpentry.org/organization-geospatial/instructor/02-intro-vector-data.html)</small></small></small>
 ]
 
 ---
@@ -106,7 +106,7 @@ Shapefiles consist of at least three mandatory files with the extensions:
 - .dbf : attribute format
 - (.prj: CRS/Projection)
 
-You don't have to remember what they are standing for, but know that you won't be able to load the data if one of those files is missing.
+You don't have to remember what they stand for, but you can only load the data if one of those files is missing.
 
 
 ---
@@ -126,7 +126,7 @@ Why?
 ```{r echo = FALSE}
 woRkshoptools::include_picture("sf.jpg")
 ```
-<small><small>Illustration by [Allison Horst](https://github.com/allisonhorst/stats-illustrations) </small></small>
+<small><small>Illustration by [Allison Horst](https://allisonhorst.com/r-packages-functions) </small></small>
 ]
 
 ---
@@ -167,7 +167,7 @@ ncol(german_states)
 
 ## Inspect your data: Classics
 
-You can see that there are no huge differences between the shapefile, we just imported, and a regular data table.
+You can see that there are no huge differences between the shapefile we just imported and a regular data table.
 
 ```{r data-inspection-head}
 # head of data table
@@ -228,7 +228,7 @@ sf::st_crs(german_states)
 
 ---
 
-## A very, VERY first map
+## A very, very first map
 
 For inspecting the data and check if we actually loaded what we want to load, we can have a very first glimpse.
 
@@ -248,7 +248,7 @@ woRkshoptools::include_picture("plot_german_states.png")
 ## Import point layer
 
 Unfortunately, the data we want to visualize or analyze are not always available as shapefiles.
-Especially, point coordinates are often stored in table formats like `.csv` - as are the location of charging stations for electric cars in our `./data` folder. 
+Point coordinates are often stored in table formats like `.csv` - as is the location of charging stations for electric cars in our `./data` folder. 
 
 ```{r load-echarging-display}
 echarging_df <- readr::read_delim("./data/charging_points_ger.csv", 
@@ -357,7 +357,7 @@ plot(echarging_sf)
 
 ## ... and the other way round
 
-Do you want to go back to handling a simple data frame? You can quickly achieve this by drop the geometry column.
+Do you want to go back to handling a simple data frame? You can quickly achieve this by dropping the geometry column.
 
 ```{r remove-geometry}
 # check class
@@ -379,10 +379,10 @@ class: middle
 
 ---
 
-## Data Wrangling
+## Data wrangling
 
 After importing the data sets, we are now ready to manipulate our data. 
-We are working here with the `dplyr` package to manipulate the data frames for all regular data wrangling tasks.
+We are working  with the `dplyr` package to manipulate the data frames for all regular data wrangling tasks.
 But if you are used to working with the base R language, feel free to do so.
 
 .center[
@@ -394,9 +394,9 @@ woRkshoptools::include_picture("tidyverse.png")
 
 ---
 
-## Data Intro: German Districts
+## Data Intro: German districts
 
-We're moving "a layer down" and look at Germany on a more fine-grained spatial level: the district.
+We're moving "a layer down" and looking at Germany on a more fine-grained spatial level: the district.
 
 ```{r load-district-display}
 german_districts <- 
@@ -408,7 +408,7 @@ german_districts
 
 
 ---
-## German Districts
+## German districts
 
 .small[
 ```{r plot_districts, echo = F , out.width = "70%"}
@@ -420,7 +420,7 @@ plot(german_districts)
 
 ## Data Intro: Attributes
 
-Since it would be a little bit boring to work with just administrative information, there's an extra table with more attributes called *attributes_districts.csv*.
+Since it would be a bit boring to work with just administrative information, there's an extra table with more attributes called *attributes_districts.csv*.
 
 ```{r load-attr-display}
 attributes_districts <- readr::read_delim("./data/attributes_districts.csv", 
@@ -437,8 +437,8 @@ head(attributes_districts, 2)
 
 ## Add attributes: Join data table
 
-You might already spot that we have an id for the districts (*AGS* and *district_id*) in both data tables. 
-This is a good example how easily `sf` objects can be handled.
+You might already see that we have an ID for the districts (*AGS* and *district_id*) in both data tables. 
+This is a good example of how easily `sf` objects can be handled.
 
 ```{r join-attrtable}
 german_districts_enhanced <- 
@@ -452,7 +452,7 @@ head(german_districts_enhanced, 2)
 
 ---
 
-## Add (More) Attributes
+## Add (more) attributes
 
 Besides the regular join, we can also perform a so-called *spatial join*.
 For example, we want to count the number of charging stations in each German district.
@@ -508,11 +508,11 @@ german_districts_enhanced <-
 
 
 ---
-## Subsetting the Data
+## Subsetting the data
 
 One might be interested in only one specific area of Germany, like Cologne.
-To subset a `sf` object,  you often can use your usual data wrangling workflow. 
-In this case, I know the district_id and that is also the only information I want to keep.
+To subset a `sf` object,  you can often use your usual data wrangling workflow. 
+In this case, I know the district_id, and that is the only row I want to keep.
 
 .pull-left[
 ```{r stouches-display, eval = F}
@@ -575,7 +575,7 @@ plot(cologne_surrounding)
 
 ---
 
-## Export the Data
+## Export the data
 
 After Wrangling and adjusting the data, you can save them.
 There are, again, several options to do so.
@@ -584,7 +584,7 @@ Two notes:
 
 1.Be careful when saving shapefiles: column names will automatically be abbreviated!
 
-2.Make sure that the CRS is included either in your folder or the file name.
+2.Make sure that the CRS is included in your folder or the file name.
 
 ]
 

@@ -23,7 +23,7 @@ klippy::klippy()
 From here on, you can go and explore!
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-Have fun with creating maps and exploring the package `tmap`! 
+Have fun creating maps and exploring the package `tmap`! 
 
 Toolbox:
 

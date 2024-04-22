@@ -23,7 +23,7 @@ klippy::klippy()
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
 Import the ESRI shapefile of German districts and the district attribute table.
-Join the two data frames, transform the CRS to `EPSG:3035` and check your changes. 
+Join the two data frames, transform the CRS to `EPSG:3035`, and check your changes. 
 ```
 
 ```{block, opts.label = "clues"}
@@ -60,8 +60,7 @@ head(german_districts_enhanced, 2)
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
 We want a first descriptive visual of the distribution of charging stations in Cologne (or any other district of your choice) and the surrounding districts. 
 Filter the district of Cologne (`district_id == "05315"`) and find the surrounding districts.
-Calculate the number of charger per district (`charger_count`) and the number of charger per 1,000 inhabitant in each district (`charger_dens`). 
-
+Calculate the number of chargers per district (`charger_count`) and the number of chargers per 1,000 inhabitants in each district (`charger_dens`). 
 Plot the two columns for Cologne and its surrounding districts.
 ```
 
@@ -69,7 +68,7 @@ Plot the two columns for Cologne and its surrounding districts.
 You can use the dplyr function `sf::bind_rows()` to combine the two spatial objects, "Cologne" and "Cologne Surroundings".
 ```
 
-```{r second-exercise, solution = TRUE, cache = TRUE}
+```{r second-exercise, solution = TRUE}
 
 # filter Cologne
 cologne <-

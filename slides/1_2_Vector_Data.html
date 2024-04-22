@@ -766,10 +766,10 @@ layout: true
 
 ## Why care about data types and formats?
 
-There is a difference in how spatial information is stored, processed, and visually represented.
-- Different commands to import and handle the data
-- Spatial linking techniques and analyses partially determined by the data format
-- Visualization of data can differ
+There are differences in the way spatial information is stored, processed, and visually represented.
+- Different commands for data import and manipulation
+- Spatial linking techniques and analyses partly determined by data format
+- Visualization of data can vary
 
 So: Always know what kind of data you are dealing with!
 
@@ -786,23 +786,23 @@ So: Always know what kind of data you are dealing with!
 .pull-right[
 The surface of the earth is represented by simple geometries and attributes.
 
-Every object is defined by longitude (x) and latitude (y) values.
+Each object is defined by longitude (x) and latitude (y) values.
 ]
 
 ---
 
 ## Vector data: Geometries
 .pull-left[
-Each real-world feature is one of three types of geometries:
+Every real-world feature is one of three types of geometry:
 - Points: discrete location (e.g., city)
 - Lines: linear feature (e.g., river)
-- Polygons: enclosed area  (e.g, country, administrative borders)
+- Polygons: enclosed area  (e.g, country, administrative boundaries)
 ]
 
 .pull-right[
 &lt;img src=&quot;data:image/png;base64,#../img/vector_geometries.png&quot; width=&quot;90%&quot; style=&quot;display: block; margin: auto;&quot; /&gt;
 &lt;br&gt;
-&lt;small&gt;&lt;small&gt;&lt;small&gt; National Ecological Observatory Network (NEON), cited by [Datacarpentry](https://datacarpentry.org/organization-geospatial/02-intro-vector-data/)&lt;/small&gt;&lt;/small&gt;&lt;/small&gt;
+&lt;small&gt;&lt;small&gt;&lt;small&gt; National Ecological Observatory Network (NEON), cited by [Datacarpentry](https://datacarpentry.org/organization-geospatial/instructor/02-intro-vector-data.html)&lt;/small&gt;&lt;/small&gt;&lt;/small&gt;
 ]
 
 ---
@@ -834,7 +834,7 @@ Shapefiles consist of at least three mandatory files with the extensions:
 - .dbf : attribute format
 - (.prj: CRS/Projection)
 
-You don&#39;t have to remember what they are standing for, but know that you won&#39;t be able to load the data if one of those files is missing.
+You don&#39;t have to remember what they stand for, but you can only load the data if one of those files is missing.
 
 
 ---
@@ -852,7 +852,7 @@ Why?
 
 .pull-right[
 &lt;img src=&quot;data:image/png;base64,#../img/sf.jpg&quot; width=&quot;1600&quot; style=&quot;display: block; margin: auto;&quot; /&gt;
-&lt;small&gt;&lt;small&gt;Illustration by [Allison Horst](https://github.com/allisonhorst/stats-illustrations) &lt;/small&gt;&lt;/small&gt;
+&lt;small&gt;&lt;small&gt;Illustration by [Allison Horst](https://allisonhorst.com/r-packages-functions) &lt;/small&gt;&lt;/small&gt;
 ]
 
 ---
@@ -911,7 +911,7 @@ ncol(german_states)
 
 ## Inspect your data: Classics
 
-You can see that there are no huge differences between the shapefile, we just imported, and a regular data table.
+You can see that there are no huge differences between the shapefile we just imported and a regular data table.
 
 
 ```r
@@ -926,14 +926,13 @@ head(german_states, 2)
 ## Bounding box:  xmin: 426205.6 ymin: 5913462 xmax: 650128.7 ymax: 6101487
 ## Projected CRS: ETRS89 / UTM zone 32N
 ## # A tibble: 2 × 24
-##     ADE    GF   BSG ARS   AGS   SDV_ARS     GEN   BEZ     IBZ BEM  
-##   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
-## 1     2     4     1 01    01    0100200000… Schl… Land     20 --   
-## 2     2     4     1 02    02    0200000000… Hamb… Frei…    22 --   
-## # ℹ 14 more variables: NBD &lt;chr&gt;, SN_L &lt;chr&gt;, SN_R &lt;chr&gt;,
-## #   SN_K &lt;chr&gt;, SN_V1 &lt;chr&gt;, SN_V2 &lt;chr&gt;, SN_G &lt;chr&gt;, FK_S3 &lt;chr&gt;,
-## #   NUTS &lt;chr&gt;, ARS_0 &lt;chr&gt;, AGS_0 &lt;chr&gt;, WSK &lt;date&gt;,
-## #   DEBKG_ID &lt;chr&gt;, geometry &lt;MULTIPOLYGON [m]&gt;
+##     ADE    GF   BSG ARS   AGS   SDV_ARS     GEN   BEZ     IBZ BEM   NBD   SN_L  SN_R 
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1     2     4     1 01    01    0100200000… Schl… Land     20 --    ja    01    0    
+## 2     2     4     1 02    02    0200000000… Hamb… Frei…    22 --    ja    02    0    
+## # ℹ 11 more variables: SN_K &lt;chr&gt;, SN_V1 &lt;chr&gt;, SN_V2 &lt;chr&gt;, SN_G &lt;chr&gt;,
+## #   FK_S3 &lt;chr&gt;, NUTS &lt;chr&gt;, ARS_0 &lt;chr&gt;, AGS_0 &lt;chr&gt;, WSK &lt;date&gt;, DEBKG_ID &lt;chr&gt;,
+## #   geometry &lt;MULTIPOLYGON [m]&gt;
 ```
 
 ---
@@ -1179,7 +1178,7 @@ sf::st_crs(german_states)
 
 ---
 
-## A very, VERY first map
+## A very, very first map
 
 For inspecting the data and check if we actually loaded what we want to load, we can have a very first glimpse.
 
@@ -1198,7 +1197,7 @@ plot(german_states)
 ## Import point layer
 
 Unfortunately, the data we want to visualize or analyze are not always available as shapefiles.
-Especially, point coordinates are often stored in table formats like `.csv` - as are the location of charging stations for electric cars in our `./data` folder. 
+Point coordinates are often stored in table formats like `.csv` - as is the location of charging stations for electric cars in our `./data` folder. 
 
 
 ```r
@@ -1209,15 +1208,14 @@ head(echarging_df)
 
 ```
 ## # A tibble: 6 × 7
-##   operator          federal_state latitude longitude power_kw type 
-##   &lt;chr&gt;             &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;
-## 1 deer GmbH         Baden-Württe…     48.3      9.72       44 Norm…
-## 2 EnBW mobility+ A… Baden-Württe…     48.6      9.87       93 Schn…
-## 3 SWU Energie GmbH  Baden-Württe…     48.5     10.2        44 Norm…
-## 4 SWU Energie GmbH  Baden-Württe…     48.6     10.1        44 Norm…
-## 5 SWU Energie GmbH  Baden-Württe…     48.2     10.1        22 Norm…
-## 6 EnBW mobility+ A… Baden-Württe…     48.5      9.98       30 Norm…
-## # ℹ 1 more variable: num_plugs &lt;dbl&gt;
+##   operator                  federal_state latitude longitude power_kw type  num_plugs
+##   &lt;chr&gt;                     &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
+## 1 deer GmbH                 Baden-Württe…     48.3      9.72       44 Norm…         2
+## 2 EnBW mobility+ AG und Co… Baden-Württe…     48.6      9.87       93 Schn…         2
+## 3 SWU Energie GmbH          Baden-Württe…     48.5     10.2        44 Norm…         2
+## 4 SWU Energie GmbH          Baden-Württe…     48.6     10.1        44 Norm…         2
+## 5 SWU Energie GmbH          Baden-Württe…     48.2     10.1        22 Norm…         1
+## 6 EnBW mobility+ AG und Co… Baden-Württe…     48.5      9.98       30 Norm…         2
 ```
 
 
@@ -1292,7 +1290,7 @@ echarging_sf &lt;-
       echarging_df %&gt;% 
         # there were some missings in my data that
         # are not allowed 
-        filter(!is.na(longitude) &amp; !is.na(latitude)),    
+        dplyr::filter(!is.na(longitude) &amp; !is.na(latitude)),    
     coords = c(&quot;longitude&quot;,&quot;latitude&quot;),
     crs = 4326
   )
@@ -1309,7 +1307,7 @@ echarging_sf &lt;-
 
 ## ... and the other way round
 
-Do you want to go back to handling a simple data frame? You can quickly achieve this by drop the geometry column.
+Do you want to go back to handling a simple data frame? You can quickly achieve this by dropping the geometry column.
 
 
 ```r
@@ -1329,14 +1327,12 @@ sf::st_drop_geometry(german_states) %&gt;%
 
 ```
 ## # A tibble: 2 × 23
-##     ADE    GF   BSG ARS   AGS   SDV_ARS     GEN   BEZ     IBZ BEM  
-##   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
-## 1     2     4     1 01    01    0100200000… Schl… Land     20 --   
-## 2     2     4     1 02    02    0200000000… Hamb… Frei…    22 --   
-## # ℹ 13 more variables: NBD &lt;chr&gt;, SN_L &lt;chr&gt;, SN_R &lt;chr&gt;,
-## #   SN_K &lt;chr&gt;, SN_V1 &lt;chr&gt;, SN_V2 &lt;chr&gt;, SN_G &lt;chr&gt;, FK_S3 &lt;chr&gt;,
-## #   NUTS &lt;chr&gt;, ARS_0 &lt;chr&gt;, AGS_0 &lt;chr&gt;, WSK &lt;date&gt;,
-## #   DEBKG_ID &lt;chr&gt;
+##     ADE    GF   BSG ARS   AGS   SDV_ARS     GEN   BEZ     IBZ BEM   NBD   SN_L  SN_R 
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1     2     4     1 01    01    0100200000… Schl… Land     20 --    ja    01    0    
+## 2     2     4     1 02    02    0200000000… Hamb… Frei…    22 --    ja    02    0    
+## # ℹ 10 more variables: SN_K &lt;chr&gt;, SN_V1 &lt;chr&gt;, SN_V2 &lt;chr&gt;, SN_G &lt;chr&gt;,
+## #   FK_S3 &lt;chr&gt;, NUTS &lt;chr&gt;, ARS_0 &lt;chr&gt;, AGS_0 &lt;chr&gt;, WSK &lt;date&gt;, DEBKG_ID &lt;chr&gt;
 ```
 
 ---
@@ -1350,10 +1346,10 @@ class: middle
 
 ---
 
-## Data Wrangling
+## Data wrangling
 
 After importing the data sets, we are now ready to manipulate our data. 
-We are working here with the `dplyr` package to manipulate the data frames for all regular data wrangling tasks.
+We are working  with the `dplyr` package to manipulate the data frames for all regular data wrangling tasks.
 But if you are used to working with the base R language, feel free to do so.
 
 .center[
@@ -1363,9 +1359,9 @@ But if you are used to working with the base R language, feel free to do so.
 
 ---
 
-## Data Intro: German Districts
+## Data Intro: German districts
 
-We&#39;re moving &quot;a layer down&quot; and look at Germany on a more fine-grained spatial level: the district.
+We&#39;re moving &quot;a layer down&quot; and looking at Germany on a more fine-grained spatial level: the district.
 
 
 ```r
@@ -1383,37 +1379,37 @@ german_districts
 ## Bounding box:  xmin: 4031313 ymin: 2684076 xmax: 4672526 ymax: 3551489
 ## Projected CRS: ETRS89-extended / LAEA Europe
 ## # A tibble: 431 × 24
-##      ADE    GF   BSG ARS   AGS   SDV_ARS    GEN   BEZ     IBZ BEM  
-##  * &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
-##  1     4     4     1 01001 01001 010010000… Flen… Krei…    40 --   
-##  2     4     4     1 01002 01002 010020000… Kiel  Krei…    40 --   
-##  3     4     4     1 01003 01003 010030000… Lübe… Krei…    40 --   
-##  4     4     4     1 01004 01004 010040000… Neum… Krei…    40 --   
-##  5     4     4     1 01051 01051 010510044… Dith… Kreis    42 --   
-##  6     4     4     1 01053 01053 010530100… Herz… Kreis    42 --   
-##  7     4     4     1 01054 01054 010540056… Nord… Kreis    42 --   
-##  8     4     4     1 01055 01055 010550012… Osth… Kreis    42 --   
-##  9     4     4     1 01056 01056 010560039… Pinn… Kreis    42 --   
-## 10     4     4     1 01057 01057 010570057… Plön  Kreis    42 --   
+##      ADE    GF   BSG ARS   AGS   SDV_ARS    GEN   BEZ     IBZ BEM   NBD   SN_L  SN_R 
+##  * &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+##  1     4     4     1 01001 01001 010010000… Flen… Krei…    40 --    ja    01    0    
+##  2     4     4     1 01002 01002 010020000… Kiel  Krei…    40 --    ja    01    0    
+##  3     4     4     1 01003 01003 010030000… Lübe… Krei…    40 --    ja    01    0    
+##  4     4     4     1 01004 01004 010040000… Neum… Krei…    40 --    ja    01    0    
+##  5     4     4     1 01051 01051 010510044… Dith… Kreis    42 --    ja    01    0    
+##  6     4     4     1 01053 01053 010530100… Herz… Kreis    42 --    ja    01    0    
+##  7     4     4     1 01054 01054 010540056… Nord… Kreis    42 --    ja    01    0    
+##  8     4     4     1 01055 01055 010550012… Osth… Kreis    42 --    ja    01    0    
+##  9     4     4     1 01056 01056 010560039… Pinn… Kreis    42 --    ja    01    0    
+## 10     4     4     1 01057 01057 010570057… Plön  Kreis    42 --    ja    01    0    
 ## # ℹ 421 more rows
-## # ℹ 14 more variables: NBD &lt;chr&gt;, SN_L &lt;chr&gt;, SN_R &lt;chr&gt;,
-## #   SN_K &lt;chr&gt;, SN_V1 &lt;chr&gt;, SN_V2 &lt;chr&gt;, SN_G &lt;chr&gt;, FK_S3 &lt;chr&gt;,
-## #   NUTS &lt;chr&gt;, ARS_0 &lt;chr&gt;, AGS_0 &lt;chr&gt;, WSK &lt;date&gt;,
-## #   DEBKG_ID &lt;chr&gt;, geometry &lt;MULTIPOLYGON [m]&gt;
+## # ℹ 11 more variables: SN_K &lt;chr&gt;, SN_V1 &lt;chr&gt;, SN_V2 &lt;chr&gt;, SN_G &lt;chr&gt;,
+## #   FK_S3 &lt;chr&gt;, NUTS &lt;chr&gt;, ARS_0 &lt;chr&gt;, AGS_0 &lt;chr&gt;, WSK &lt;date&gt;, DEBKG_ID &lt;chr&gt;,
+## #   geometry &lt;MULTIPOLYGON [m]&gt;
 ```
 
 
 ---
-## German Districts
+## German districts
 
 .small[
 &lt;img src=&quot;data:image/png;base64,#1_2_Vector_Data_files/figure-html/plot_districts-1.png&quot; width=&quot;70%&quot; style=&quot;display: block; margin: auto;&quot; /&gt;
 ]
+
 ---
 
 ## Data Intro: Attributes
 
-Since it would be a little bit boring to work with just administrative information, there&#39;s an extra table with more attributes called *attributes_districts.csv*.
+Since it would be a bit boring to work with just administrative information, there&#39;s an extra table with more attributes called *attributes_districts.csv*.
 
 
 ```r
@@ -1426,20 +1422,19 @@ attributes_districts &lt;- readr::read_delim(&quot;./data/attributes_districts.c
 
 ```
 ## # A tibble: 2 × 7
-##   district_id car_density ecar_share publictransport_meandist
-##         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;                    &lt;dbl&gt;
-## 1        1001        492.        2.4                     176.
-## 2        1002        453.        2.2                     191.
-## # ℹ 3 more variables: population &lt;dbl&gt;, green_voteshare &lt;dbl&gt;,
-## #   afd_voteshare &lt;dbl&gt;
+##   district_id car_density ecar_share publictransport_meandist population
+##         &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;                    &lt;dbl&gt;      &lt;dbl&gt;
+## 1        1001        492.        2.4                     176.      92550
+## 2        1002        453.        2.2                     191.     247717
+## # ℹ 2 more variables: green_voteshare &lt;dbl&gt;, afd_voteshare &lt;dbl&gt;
 ```
 
 ---
 
 ## Add attributes: Join data table
 
-You might already spot that we have an id for the districts (*AGS* and *district_id*) in both data tables. 
-This is a good example how easily `sf` objects can be handled.
+You might already see that we have an ID for the districts (*AGS* and *district_id*) in both data tables. 
+This is a good example of how easily `sf` objects can be handled.
 
 
 ```r
@@ -1459,17 +1454,17 @@ head(german_districts_enhanced, 2)
 ## Bounding box:  xmin: 4279627 ymin: 3460480 xmax: 4335232 ymax: 3524426
 ## Projected CRS: ETRS89-extended / LAEA Europe
 ## # A tibble: 2 × 8
-##   district_id                       geometry car_density ecar_share
-##         &lt;dbl&gt;             &lt;MULTIPOLYGON [m]&gt;       &lt;dbl&gt;      &lt;dbl&gt;
-## 1        1001 (((4283235 3524256, 4283267 3…        492.        2.4
-## 2        1002 (((4331981 3480575, 4332008 3…        453.        2.2
-## # ℹ 4 more variables: publictransport_meandist &lt;dbl&gt;,
-## #   population &lt;dbl&gt;, green_voteshare &lt;dbl&gt;, afd_voteshare &lt;dbl&gt;
+##   district_id                  geometry car_density ecar_share publictransport_mean…¹
+##         &lt;dbl&gt;        &lt;MULTIPOLYGON [m]&gt;       &lt;dbl&gt;      &lt;dbl&gt;                  &lt;dbl&gt;
+## 1        1001 (((4283235 3524256, 4283…        492.        2.4                   176.
+## 2        1002 (((4331981 3480575, 4332…        453.        2.2                   191.
+## # ℹ abbreviated name: ¹​publictransport_meandist
+## # ℹ 3 more variables: population &lt;dbl&gt;, green_voteshare &lt;dbl&gt;, afd_voteshare &lt;dbl&gt;
 ```
 
 ---
 
-## Add (More) Attributes
+## Add (more) attributes
 
 Besides the regular join, we can also perform a so-called *spatial join*.
 For example, we want to count the number of charging stations in each German district.
@@ -1507,11 +1502,11 @@ german_districts_enhanced &lt;-
 
 
 ---
-## Subsetting the Data
+## Subsetting the data
 
 One might be interested in only one specific area of Germany, like Cologne.
-To subset a `sf` object,  you often can use your usual data wrangling workflow. 
-In this case, I know the district_id and that is also the only information I want to keep.
+To subset a `sf` object,  you can often use your usual data wrangling workflow. 
+In this case, I know the district_id, and that is the only row I want to keep.
 
 .pull-left[
 
@@ -1528,6 +1523,7 @@ plot(cologne)
 .pull-right[
 &lt;img src=&quot;data:image/png;base64,#1_2_Vector_Data_files/figure-html/stouches-1.png&quot; style=&quot;display: block; margin: auto;&quot; /&gt;
 ]
+
 ---
 
 ## Using `sf` for subsetting
@@ -1557,7 +1553,7 @@ plot(cologne_surrounding)
 
 ---
 
-## Export the Data
+## Export the data
 
 After Wrangling and adjusting the data, you can save them.
 There are, again, several options to do so.
@@ -1566,7 +1562,7 @@ Two notes:
 
 1.Be careful when saving shapefiles: column names will automatically be abbreviated!
 
-2.Make sure that the CRS is included either in your folder or the file name.
+2.Make sure that the CRS is included in your folder or the file name.
 
 ]
 
@@ -1630,6 +1626,7 @@ class: middle
 .center[
 But, that is for after lunch!
 ]
+
 ---
 
 
