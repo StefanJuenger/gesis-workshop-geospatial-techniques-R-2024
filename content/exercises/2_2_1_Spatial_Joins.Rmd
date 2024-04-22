@@ -37,8 +37,7 @@ You need two datasets for that: the point layer `charging_points_ger.csv` (remem
 ```{block, opts.label = "clues"}
 
 There are two functions you can explore: `sf::st_join` and `sf::st_intersection()`.
-The default of `sf::st_join()` will leave you with a 'left-join' and returns a data object with all chargers and matching district information for those which are located within NRW. You can reset the option to perform an 'inner-join' and keep only the observation which lay within the predefined area (`sf::st_join(x , y, join  = "", left = FALSE)`).
-
+The default of `sf::st_join()` will leave you with a 'left-join' and return a data object with all chargers and matching district information for those that are located within NRW. You can reset the option to perform an 'inner-join' and keep only the observation that lay within the predefined area (`sf::st_join(x , y, join  = "", left = FALSE)`).
 ```
 
 ```{r first, solution = TRUE}
@@ -96,11 +95,12 @@ nrow(charger_nrw)
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
 
 
-Did the operationalization of train station accessbility convince you? The INKAR data base offers another approach: Proportion of residents with max. 1000m linear distance to the nearest public transport stop in the district. 
-We do have everything to create this indicator on the smaller scale as well.
-What is the mean share of residents with max. 1000m linear distance to the nearest train station in a 5km neighbourhood of our fake respondents?
+Did the operationalization of train station accessibility convince you? The INKAR database offers another approach: Proportion of residents with max. 1000m linear distance to the nearest public transport stop in the district. 
+We have everything needed to create this indicator on a smaller scale as well.
+What is the mean share of residents with max 1000m linear distance to the nearest train station in a 5km neighborhood of our fake respondents?
 
 You can run the code below to load all the data you need.
+
 
 ```
 
@@ -163,15 +163,15 @@ inhabitants_ger <-
 ```
 
 ```{block, opts.label = "clues"}
-As always, there are several ways to do this. Anne tried to keep the workflow as close to the functions taught in this course and suggests following steps:
+As always, there are several ways to do this. Anne tried to keep the workflow as close to the functions taught in this course as possible and suggests the following steps:
 
-1. Create a point layer with the centroids of all grids  in NRW based on the z11 population layer.
+1. Create a point layer with the centroids of all grids in NRW based on the z11 population layer.
 
 2. Calculate the distance to the next train station for each grid.
 
 3. Create a column that equals 0 if the distance to the next train station is >1000m and contains the number of inhabitants if <1000.
 
-4. Rasterize the sf data object to receive two raster object: number of inhabitants and number of inhabitants with max 1000m distance to next train station.
+4. Rasterize the sf data object to receive two raster objects: number of inhabitants and number of inhabitants with a max 1000m distance to the next train station.
 
 5. Calculate the mean for the 5km buffer for each "respondent" for each raster.
 
@@ -180,7 +180,7 @@ As always, there are several ways to do this. Anne tried to keep the workflow as
 ```
 
 ```{block, opts.label = "clues"}
-In the add-on slides of the raster session Stefan introduced gave some information on how to transform raster to points (and back). To get a `sf` point layer of the raster object you can use `terra::as.points() %>% sf::st_as_sf()`. 
+In the add-on slides of the raster session, Stefan introduced and gave some information on how to transform the raster to points (and back). To get a `sf` point layer for the raster object you can use `terra::as.points() %>% sf::st_as_sf()`. 
 To rasterize the object, you can use `terra::rast(vals = .$colname, resolution = 100)`.
 ```
 

@@ -122,7 +122,7 @@ https://datasetsearch.research.google.com/
 
 Even without (in)direct spatial references, data may still be sensitive
 - Geospatial attributes add new information to existing data
-- May be part of general data privacy checks, but we may not distribute these data as is
+- Maybe part of general data privacy checks, but we may not distribute these data as is
 
 .pull-left[
 Safe Rooms / Secure Data Centers
@@ -251,7 +251,7 @@ tmaptools::read_osm(leibniz_addresses_sf, type = "esri-topo") |>
 
 ## Our Approach
 
-Different service providers can be used, e.g., Google, Bing, OSM but raises questions of data protection and quality concerns.
+Different service providers can be used, e.g., Google, Bing, and OSM, but this raises questions of data protection and quality concerns.
 
 We rely on a service offered by the Federal Agency of Cartography and Geodesy (BKG):
 
@@ -286,8 +286,7 @@ woRkshoptools::include_picture("bkggeocoder.png")
 ## Spatial Linking
 
 .pull-left[
-Geocoding tool retrieves automatically point coordinates, administrative unit keys and INSPIRE grid cell ids.
-
+The geocoding tool automatically retrieves point coordinates, administrative unit keys, and INSPIRE grid cell IDs.
 Spatial joins based on coordinates for other units:
 
 - constituencies
@@ -481,8 +480,10 @@ correspondence_table
 
 ## Conduct the Survey
 
-We ask respondents  some standard sociodemographics. But we also include an item from the [GLES Panel](https://doi.org/10.4232/1.14114) on energy transformation: "From 2030, no more new cars with petrol or diesel engines are to be registered in Germany. Do you agree?" (entrans). Since we cannot share the real data we created some fake data using the [`faux` package](https://cran.r-project.org/web/packages/faux/index.html).
-
+We ask respondents for some standard sociodemographics. 
+But we also include an item from the [GLES Panel](https://doi.org/10.4232/1.14114) on energy transformation: 
+"From 2030, no more new cars with petrol or diesel engines are to be registered in Germany. How much do you agree?" (entrans). 
+Since we cannot share the actual data, we created fake data using the [`faux` package](https://cran.r-project.org/web/packages/faux/index.html).
 
 ```{r hidden-data, include = FALSE}
 secret_data <- readRDS("./data/secrect_data.rds")
@@ -544,10 +545,8 @@ fake_survey_data
 
 ## District-level Data
 
-On the district level, we have already most of our information and/or created the indicator yesterday.
+We already have most of our information and/or created the indicator on the district level yesterday.
 Let's load the respective data, reduce it to NRW, and have a look.
-
-
 
 ```{r prep_data, eval = F}
 
@@ -604,7 +603,7 @@ sampling_area_attributes <-
 ## District Operationalization
 
 *Access to charging infrastructure*
-> Charging stations per 1000 inhabitant in a district
+> Charging stations per 1000 inhabitants in a district
 
 *Alternative means of transport*
 > Distance to public transportation in a district
@@ -622,7 +621,7 @@ Luckily, we already calculated this yesterday!
 ```{r charger-nrw, echo = FALSE}
 
 charger_nrw <- 
-  # Read charging station points datae
+  # Load charging station points 
   readr::read_delim("./data/charging_points_ger.csv", 
                                  delim = ";") %>%
   # Filter out rows with missing longitude or latitude
@@ -727,7 +726,7 @@ All left to do is a simple mutation:
 sampling_area_attributes <-
   sampling_area_attributes %>% 
   # calculate area of districts (areas will always
-  # be calculatednin units according to the CRS )
+  # be calculated in units according to the CRS )
   dplyr::mutate(area = sf::st_area(.)) %>% 
   # change unit to square kilometers
   dplyr::mutate(area_km2 = units::set_units
@@ -748,7 +747,7 @@ sampling_area_attributes <-
 sampling_area_attributes <-
   sampling_area_attributes %>% 
   # calculate area of districts (areas will always
-  # be calculatednin units according to the CRS )
+  # be calculated in units according to the CRS )
   dplyr::mutate(area = sf::st_area(.)) %>% 
   # change unit to square kilometers
   dplyr::mutate(area_km2 = units::set_units
@@ -771,7 +770,7 @@ tm_shape(sampling_area_attributes) +
 
 ## Respondents in Districts
 
-We have population density on the district level. Since our analysis focuses on the individual-level, we can spatial join the information to our fake respondents' coordinates.
+We have population density on the district level.  Since our analysis focuses on the individual level, we can spatially join the information to our fake respondents' coordinates.
 
 ```{r join-disp}
 
@@ -780,12 +779,12 @@ district_linked_df <-
   # keeping just the variables we want
   dplyr::select(charger_dens,publictransport_meandist, pop_dens) %>% 
   # since we want to join district to
-  # respondent defining coordintes first
+  # respondent defining coordinates first
   sf::st_join(fake_coordinates,
               # district data second
               . ,
               # some points may lie on the border
-              # choosing intersects therefore
+              # choosing intersects 
               join = sf::st_intersects) %>% 
   # drop our coordinates for data protection
   sf::st_drop_geometry()
@@ -804,14 +803,14 @@ head(district_linked_df, 5)
 
 ## Too boring? Let's scale it down!
 
-We have our nice fake coordinates and we do know that we also have variation within some districts (E.g. Cologne), concerning e-car mobility.
-So let's try to operationalize the variables on a smaller level of aggregation.
+We have our nice fake coordinates, and we know that we also have variations in some districts (e.g., Cologne) concerning e-car mobility.
+So, let's try to operationalize the variables on a smaller level of aggregation.
 
 *Access to charging infrastructure*
 > Charging stations in a 5000m buffer
 
 *Alternative means of transport*
-> Distance to closest train stop
+> Distance to the closest train stop
 
 *Rural-urban divide*
 > Population in a 5000m buffer 
@@ -820,7 +819,7 @@ So let's try to operationalize the variables on a smaller level of aggregation.
 
 ## Charging stations in 5000m Buffer
 
-To calculate the number of chargers in a 5km buffer, the procedure is very similar to calculating the buffers in a district.
+The procedure for calculating the number of chargers in a 5km buffer is very similar to calculating the buffers in a district.
 
 ```{r charging-stations}
 
@@ -845,7 +844,7 @@ coordinate_linked_df <-
 
 ## Distance Calculation I
 
-To measure access to alternative transportation (e.g. public transport), we want to measure the distance to the closest train station for each respondent. 
+To measure access to alternative transportation (e.g., public transport), we want to measure each respondent's distance to the closest train station. 
 We can get the train station points from OSM.
 
 ```{r trainstation-osm-load, echo = FALSE, include = FALSE}
@@ -878,7 +877,7 @@ nrw_pt_trainstops <-
   dplyr::select()
 
 
-# takes a while, so sneaky preperation
+# takes a while, so sneaky preparation
 nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
 
 ```
@@ -887,7 +886,8 @@ nrw_pt_trainstops <- sf::st_read("./data/nrw_pt_osmtrainstops.shp", crs = 3035)
 
 ## Distance Calculation II
 
-`sf::st_distance()` will calculate between **all** respondents and **all** train stations resulting in a matrix with 2,710,000 objects (1,000 respondent * 2,710 stations). We can make our lives a little bit easier by first identifying the nearest station and then calculate the distance.
+`sf::st_distance()` will calculate between **all** respondents and **all** train stations resulting in a matrix with 2,710,000 objects (1,000 respondent * 2,710 stations). 
+We can make our lives easier by first identifying the nearest station and then calculating the distance.
 
 .pull-left[
 ```{r dist-disp}
@@ -970,7 +970,7 @@ coordinate_linked_df %>%
 
 ## Join with Survey
 
-I hope you're not tired to join data tables.
+I hope you're not tired of joining data tables.
 Since we care a tiny bit more about data protection than others, we have yet another joining task left: joining the information we received using our (protected) fake coordinates to the actual survey data via the correspondence table.
 
 .pull-left[

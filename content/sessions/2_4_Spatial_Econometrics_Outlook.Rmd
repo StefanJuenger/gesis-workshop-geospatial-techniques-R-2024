@@ -71,9 +71,9 @@ There are at least two common mechanisms we are interested in spatial econometri
 ## Let's have another look at our chessboard
 
 .pull-left[
-We have to think about theory and mechanisms and how they translate into spatial effects and the data generation process.
+We have to think about theories and mechanisms and how they translate into spatial effects and the data generation process.
 
-That said, there are tests to check for the specific data generation process at hand but they are not recommended to be used naively.
+That said, there are tests to check for the specific data generation process at hand, but they are not recommended to be used naively.
 ]
 
 .pull-right[
@@ -86,11 +86,11 @@ woRkshoptools::include_picture("queen_interdependent.png")
 
 ---
 
-## Is it meaningful or just nuisance?
+## Is it meaningful or just nuisances?
 
 Space can be important in our analysis in two ways. 
 - it's meaningful in our theory and we thus interpret it accordingly after estimation
-- it can distort our empirical estimates producing bias, inconsistency and inefficiency
+- it can distort our empirical estimates, producing bias, inconsistency, and inefficiency
 
 **We can address both of these different perspectives in our analysis with spatial econometric methods.**
 
@@ -169,7 +169,7 @@ Source:[Tenor](https://tenor.com/de/view/formulas-hangover-gif-4841358)
 
 There are a lot of models you could estimate to *explain* spatial autocorrelation. And there's a vast body of literature on what's the best choice for which application. 
 
-We'd explicitly like to recommend you the work of [Tobias Rüttenauer](https://ruettenauer.github.io/publication/) for us social scientists. [Here](https://ruettenauer.github.io/SICSS-Spatial/index.html) are some really nice workshop materials.
+We'd explicitly like to recommend the work of [Tobias Rüttenauer](https://ruettenauer.github.io/publication/) for us social scientists. [Here](https://ruettenauer.github.io/SICSS-Spatial/index.html) are some really nice workshop materials.
 
 
 **In this session, we will only estimate Spatial Lag Y and X and Spatial Error Models.**
@@ -178,7 +178,7 @@ We'd explicitly like to recommend you the work of [Tobias Rüttenauer](https://r
 
 ## 'Research' question and data
 
-We will use the same example as in the previous session. But this time we will actually test if one of our spatial regression models helps in investigating the data generation process any further. We may ask:
+We will use the same example as in the previous session. But this time, we will actually test if one of our spatial regression models helps investigating the data generation process any further. We may ask:
 
 1. Do immigrant shares have an effect on AfD voting shares within voting districts?
 2. Do immigrant shares have an effect on AfD voting shares between neighborhoods? (=spillover)
@@ -446,8 +446,8 @@ course_content %>%
 ## Mapping
 
 Main Messages
-- basis of each map is the geometries of geospatial data
-- spatial distribution of attributes become visible when  defining an attribute and adding color scales
+- the basis of each map is the geometries of geospatial data
+- spatial distribution of attributes becomes visible when  defining an attribute and adding color scales
 - layer shapefiles to add more information or for aesthetic reasons
 
 ---
@@ -503,7 +503,7 @@ course_content %>%
 
 Main Messages
 - Georeferenced survey data require handling sensitive data
-- our example of wrangling and linking data but applications may vary
+- our example of wrangling and linking data, but applications may vary
 - spatial joins are the perfect tool to add geospatial information to other georeferenced data
 
 ---
@@ -613,12 +613,12 @@ class: middle
 
 ## What if you got missing values?
 
-Missing values in spatial regression models does produce similar problems as in ordinary regression analysis
+Missing values in spatial regression models do produce similar problems as in ordinary regression analysis
 - yield biased estimates
 - reduces statistical power
 
 However, the issue gets a bit more severe as the observations interdependent
-- we are missing out more information
+- we are missing out on more information
 - even randomness of missings might get problematic
 -
 

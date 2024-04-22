@@ -21,7 +21,7 @@ knitr::opts_template$set(
 klippy::klippy()
 ```
 
-Let's see how different neighborhood matrix styles can impact the estimates of spatial regression models. Run the code below in order to have the data in place for this exercises. (You can ignore any warning messages.)
+Let's see how different neighborhood matrix styles can impact the estimates of spatial regression models. Run the code below in order to have the data in place for this exercise. (You can ignore any warning messages.)
 
 ```{r compile-data, include = FALSE}
 
@@ -118,7 +118,7 @@ election_results <-
 ```
 
 ```{block, box.title = "1", box.body = list(fill = "white"), box.icon = "fa-star"}
-Re-use the code from the previous exercise for the Queen neighborhoods. But this time do one weight matrix with row-normalization and another one with minmax-normalization. Insert them into two spatial regression lag models of your choice using the same variables as in the lecture, i.e., both of them should either be a Spatial Lag Y or Spatial Lag X model.
+Re-use the code from the previous exercise for the Queen neighborhoods. But this time, do one weight matrix with row-normalization and another one with minmax-normalization. Insert them into two spatial regression lag models of your choice using the same variables as in the lecture, i.e., both of them should either be a Spatial Lag Y or Spatial Lag X model.
 ```
 
 ```{block, opts.label = "clues"}
@@ -162,5 +162,5 @@ spatialreg::impacts(spatial_lag_y_W, listw = queen_W)
 spatialreg::impacts(spatial_lag_y_minmax, listw = queen_minmax)
 
 # There are some slight differences in the estimate of the indirect effects but
-# more severe one in the calculation of the direct ones.
+# more severe in the calculation of the direct ones.
 ```
