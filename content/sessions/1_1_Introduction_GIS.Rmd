@@ -157,6 +157,14 @@ woRkshoptools::include_picture("so-tell-me-5be02d.jpg")
 
 ---
 
+## Download Materials
+
+```{r download-repo, echo = FALSE, out.width = "75%"}
+woRkshoptools::include_picture("download_repo.png")
+```
+
+---
+
 ## Course Schedule
 
 ```{r course-content, echo = FALSE}
@@ -179,7 +187,7 @@ course_content %>%
 .pull-left[
 Exploiting geographic information is not new.
 
-For example, Siegfried (1913) has used soil composition information to explain election results in France.
+For example, Siegfried (1913) used soil composition information to explain election results in France.
 ]
 
 .pull-right[
@@ -192,7 +200,6 @@ woRkshoptools::include_picture("siegfried.png")
 ---
 
 ## The Chicago School!
-
 
 ```{r park-etal-pic, echo = FALSE, out.width = "50%"}
 woRkshoptools::include_picture("park_etal.png")
@@ -211,9 +218,9 @@ woRkshoptools::include_picture("nature_prejudice.png")
 ]
 
 .pull-right[
-A lot of classic theories inherently make use of space
+A lot of classic theories inherently make use of space.
 
-For example, in Allport's (1954) contact theory, he at least implicitly assumes that people meet in a set space
+For example, in Allport's (1954) contact theory, he at least implicitly assumes that people meet in a set space.
 ]
 
 ---
@@ -288,7 +295,7 @@ woRkshoptools::include_picture("fig_geometries.png")
 
 ## Geospatial Data in This Course I
 
-In the folder called `./data` in the same folder as the other materials for this workshop, you can find (most of) the data files prepped for all the exercises and slides. The following data are included:
+In the folder called `./data`, you can find (most of) the data files prepped for all the exercises and slides. The following data are included:
 
 - Administrative borders of Germany (Prefix *VG250_*) are provided by the German [Federal Agency for Cartography and Geodesy](http://www.bkg.bund.de)(2018). Check out their [Open Data Portal](https://gdz.bkg.bund.de/index.php/default/open-data.html).
 
@@ -376,14 +383,14 @@ woRkshoptools::include_picture("fig_projections.png")
 
 ## Types of CRS
 
-Differentiating between different CRS is wild (at least for me...). In your research, you may hear from geographic, geocentric, projected, or local CRS.
+Differentiating between different CRS is wild (at least for me...). You may hear from geographic, geocentric, projected, or local CRS in your research.
 
 What's the difference?
 
 - whether 2 dimensional (longitude, latitude) or 3 dimensional (+height) coordinates are used
 - the location of the coordinate system's origin (center of earth or not)
-- projection on flat surface (transformation of longitudes and latitudes to x and y coordinates)
-- location (the smaller the more precise are projections)
+- projection on a flat surface (transformation of longitudes and latitudes to x and y coordinates)
+- location (the smaller, the more precise are projections)
 
 *In practice, you shouldn't worry too much about CRS. Again, what matters is that they match.*
 
@@ -444,7 +451,7 @@ PROJCS["ETRS89 / LAEA Europe",
 
 ## Current Transition From `PROJ.4` to `WKT` in `R`
 
-Currently, there's a transition from the bit old standard of `PROJ.4` to `WKT` in many `R` packages.
+There's a transition from the old standard of `PROJ.4` to `WKT` in many `R` packages.
 - sometimes, you'll get warnings
 - you should check what's causing the warning
 - in the best case, they will disappear in the future
@@ -455,7 +462,7 @@ Currently, there's a transition from the bit old standard of `PROJ.4` to `WKT` i
 
 .pull-left[
 Eventually, it's not as challenging to work with CRS in `R` as it may seem
-- we don't have to use PROJ.4 or WKT strings directly.
+- we don't have to use PROJ.4 or WKT strings directly
 
 Most of the times it's enough to use so-called EPSG Codes ("European Petroleum Survey Group Geodesy")
 - Small digit sequence
