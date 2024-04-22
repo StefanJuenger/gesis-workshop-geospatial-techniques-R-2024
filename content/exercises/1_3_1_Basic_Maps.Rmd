@@ -28,7 +28,7 @@ The focus of this first session lies on the package `tmap` to create maps.
 Let's start super simple.
 Import our enhanced district data.
 Create a map with only the outline of Germany and one where the districts' borders are visible.
-Chose a color of your choice for both maps.
+Choose a color of your choice for both maps.
 ```
 
 ```{r first.exercise, solution = TRUE}
@@ -63,7 +63,7 @@ tm_shape(german_districts_enhanced) +
 ```
 
 ```{block, box.title = "2", box.body = list(fill = "white"), box.icon = "fa-star"}
-In a second step, we want to visualize some information on the German districts contained in the attribute table.
+In the second step, we want to visualize some information on the German districts contained in the attribute table.
 Choose a column of interest and create a map.
 Alternate the map by:
 
@@ -105,4 +105,6 @@ tm_shape(german_districts_enhanced) +
    tm_legend(legend.outside = TRUE,                      # positions the legend outside           
             legend.outside.position = "left")            # defines legend positions 
 
+
+ger_map
 ```

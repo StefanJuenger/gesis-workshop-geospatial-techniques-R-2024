@@ -23,7 +23,7 @@ course_content %>%
 
 ---
 
-## Fun With Flags... MAPS, It's Maps!
+## Fun With Flags... MAPS!
 
 .center[
 ```{r fun-flags, echo = FALSE, out.width = "90%"}
@@ -37,7 +37,7 @@ woRkshoptools::include_picture("fun_with_flags.jpg")
 
 ---
 
-## Fun With Maps
+## Fun with maps
 
 .pull-left[
 `plot()` does not allow us to manipulate the maps in an easy. But we already have the two most essential ingredients to create a nice map:
@@ -89,7 +89,7 @@ plot(attributed_cologne["ecar"])
 
 ---
 
-## Cologne Data
+## Cologne data
 
 ```{r load-in-data, eval = FALSE}
 
@@ -104,7 +104,7 @@ streets_cologne <- sf::read_sf("./data/streets_cologne.shp")
 
 ---
 
-## What Makes a Good Map?
+## What makes a good map?
 
 <br>
 .pull-left[
@@ -127,7 +127,7 @@ streets_cologne <- sf::read_sf("./data/streets_cologne.shp")
 
 ---
 
-## What Makes a Good Map?
+## What makes a good map?
 
 .pull-left[
 .center[![](https://media.giphy.com/media/C9x8gX02SnMIoAClXa/giphy-downsized-large.gif)]
@@ -147,7 +147,7 @@ streets_cologne <- sf::read_sf("./data/streets_cologne.shp")
 
 ---
 
-## The Choice Is Yours: `R` Packages for Mapping
+## The choice is Yours: `R` Packages for Mapping
 
 <br>
 <br>
@@ -156,7 +156,7 @@ What is out there? Just a few:
 - base R graphics package: [`mapdata`](https://rpubs.com/rbatzing/mapping)
 - mobile-friendly interactive maps: [`leaflet`](https://rstudio.github.io/leaflet/)
 - interactive and static thematic maps based on shapefiles:
-- [`tmap`](https://mran.microsoft.com/snapshot/2014-12-22/web/packages/tmap/vignettes/tmap-nutshell.html)
+- [`tmap`](https://cran.r-project.org/web/packages/tmap/vignettes/tmap-getstarted.html)
 - [`mapview`](https://r-spatial.github.io/mapview/)
 
 
@@ -171,7 +171,7 @@ Today, we'll concentrate on the package [`tmap`](https://cran.r-project.org/web/
 ```{r world-map, echo = FALSE, out.width="50%"}
 woRkshoptools::include_picture("68747470733a2f2f6d74656e6e656b65732e6769746875622e696f2f646f776e6c6f6164732f696d616765732f636c61737369632e706e67.png")
 ```
-.tinyisher[.center[[Source](https://camo.githubusercontent.com/63d5460e5fdfb78d42eedeaa54c14b63fcb7c872ac85e8c49fd1fd827553e9be/68747470733a2f2f6d74656e6e656b65732e6769746875622e696f2f646f776e6c6f6164732f696d616765732f636c61737369632e706e67)]]
+.tinyisher[.center[[Source](https://www.researchgate.net/figure/Classic-world-map-consisting-of-gridded-elevation-data-rivers-country-borders-and_fig7_324652152)]]
 
 .footnote[*A wide-known 'secret' is that `tmap` creates a map based on `ggplot2`, so `ggplot2`-specific graphics manipulations will work as well.]
 
@@ -205,7 +205,7 @@ tm_shape(attributed_cologne) +
 ## `tmap` In a Nutshell
 
 .pull-left[
-There is not much to consider when using `tmap` but essential two requirements:
+There is not much to consider when using `tmap` but two essential requirements:
 1. Define your spatial object.
 2. Choose a building block to determine how to display information.
 ]
@@ -345,12 +345,11 @@ tm_shape(attributed_cologne) +
 After we took care of our geometric types, we want to add some information to our data.
 The inner construction of each building block of `tm_elements` is the same.
 1. Define the variable of interest first by stating the column name. 
-2. Add a name for legend title, color palette, adjust legend, scales ...
-
+2. Add a name for the legend title and color palette, adjust the legend and scales ...
 
 ---
 
-## Chosing an Attribute
+## Choosing an Attribute
 
 .pull-left[
 ```{r life-exp-disp, eval = F}
@@ -372,7 +371,7 @@ tm_shape(attributed_cologne) +
 
 ---
 
-## Chosing a Color Palette
+## Choosing a Color Palette
 
 .pull-left[
 ```{r add-attributes-disp, eval = F}
@@ -506,6 +505,10 @@ ecar_map
 ```{r interactive-map-exec, echo = FALSE, eval = TRUE, out.width="80%", out.height="80%"}
 tmap_mode("view")
 
+ecar_map <-
+tm_shape(attributed_cologne) +
+  tm_borders(col = "black") +
+  tm_polygons("ecar")
 ecar_map 
 
 tmap_mode("plot")
@@ -532,7 +535,7 @@ tmap_mode("plot")
 ```{r facets-disp-II-disp, out.width="50%",  out.height="50%"}
 
 attributed_cologne %>%
-  dplyr::mutate(city_area = as.integer(substr(id, 1, 1)))
+  dplyr::mutate(city_area = as.integer(substr(id, 1, 1))) %>% 
   tm_shape(.) +
     tm_polygons(c("ecar")) +
     tm_facets(by = "city_area", nrow = 2) +
@@ -595,8 +598,8 @@ colorBlindness::cvdPlot(tmp)
 
 ## Animation
 
-`tm_animate` allows you to create animated maps and visualize changes in spatial data e.g. over time or attributes.
-You can customize the animation's duration, frame rate, timeline sliders and transition effects.
+`tm_animate` allows you to create animated maps and visualize changes in spatial data, e.g. over time or attributes.
+You can customize the animation's duration, frame rate, timeline sliders, and transition effects.
 
 .pull-left[
 ```{r annimate-map, eval=F}
@@ -636,12 +639,12 @@ woRkshoptools::include_picture("vote_gif.gif")
 - Interactive Web Maps: HTML, JavaScript (using packages like leaflet).
 - Animated Maps: GIF, MP4, etc.
 
-You can alsp control width and height, dpi etc.
+You can also control width and height, dpi, etc.
 
 ```{r save-maps, eval = F}
 
 # save regular map
-tmap_save(area_map, filename = "are_map.png")
+tmap_save(ecar_map, filename = "ecar_map.png")
 # save as interactive map
 tmap_save(ecar_map, filename = "ecar_map.html" )
 ```
@@ -699,7 +702,7 @@ class: middle
 Instead of placing maps next to each other, we can also explore spatial correlations by adding layers.
 Another benefit of layering: We can make our map more realistic and aesthetic.
 
-For example, we can add a background layer of neighboring countries, add a layer of German cities, or the German states' borders for orientation.
+For example, we can add a background layer of neighboring countries, a layer of German cities, or the German states' borders for orientation.
 Each layer can visualize another attribute of our map.
 
 For today, we want to add a layer of charging stations to the electric car map.
