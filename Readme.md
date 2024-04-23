@@ -38,7 +38,7 @@ This course will teach its participants how to exploit R to apply its geospatial
 
 [1_2_1 Import Vector Data](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_2_1_Import_Vector_Data.html)
 
-[1_2_2 Manipulate Vector Data](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_2_1_Manipulate_Vector_Data.html)
+[1_2_2 Manipulate Vector Data](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_2_2_Manipulate_Vector_Data.html)
 
 [1_3_1 Basic Maps](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/exercises/1_3_1_Basic_Maps.html)
 
@@ -63,7 +63,7 @@ This course will teach its participants how to exploit R to apply its geospatial
 
 [1_2_1 Import Vector Data](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_2_1_Import_Vector_Data.html)
 
-[1_2_2 Manipulate Vector Data](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_2_1_Manipulate_Vector_Data.html)
+[1_2_2 Manipulate Vector Data](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_2_2_Manipulate_Vector_Data.html)
 
 [1_3_1 Basic Maps](https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/solutions/1_3_1_Basic_Maps.html)
 
