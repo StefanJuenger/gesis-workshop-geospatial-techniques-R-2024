@@ -82,15 +82,20 @@ woRkshoptools::include_picture("Stefan.png")
 ]
 
 .pull-right[
+.small[
 - Senior Researcher in the team Survey Data Augmentation at the GESIS department Survey Data Curation
 - Ph.D. in social sciences, University of Cologne
 ]
+]
 
+.small[
 - Research interests:
-  - Quantitative methods & Geographic Information Systems (GIS)
-  - Social inequalities & attitudes towards minorities
+  - Quantitative methods, Geographic Information Systems (GIS)
+  - Social inequalities
+  - Attitudes towards minorities
   - Environmental attitudes
   - Reproducible research
+]
 
 .small[
 [stefan.juenger@gesis.org](mailto:stefan.juenger@gesis.org) |
