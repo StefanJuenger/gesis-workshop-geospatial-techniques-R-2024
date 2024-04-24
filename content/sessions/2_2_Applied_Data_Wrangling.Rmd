@@ -158,9 +158,7 @@ woRkshoptools::include_picture("fig_linking_workflow_simple.png")
 
 ---
 
----
-
-## One Last Important Bit: Geocoding
+## Geocoding
 
 Geocoding is the conversion of indirect spatial references (e.g., addresses) into direct spatial references (e.g., coordinates)
 
@@ -251,8 +249,6 @@ tmaptools::read_osm(leibniz_addresses_sf, type = "esri-topo") |>
 
 ## Our Approach
 
-Different service providers can be used, e.g., Google, Bing, and OSM, but this raises questions of data protection and quality concerns.
-
 We rely on a service offered by the Federal Agency of Cartography and Geodesy (BKG):
 
 - Online interface and API for online geocoding
@@ -281,12 +277,12 @@ woRkshoptools::include_picture("bkggeocoder.png")
 ]
 
 
-
+---
 
 ## Spatial Linking
 
 .pull-left[
-The geocoding tool automatically retrieves point coordinates, administrative unit keys, and INSPIRE grid cell IDs.
+The geocoding tool automatically retrieves point coordinates, administrative unit keys, and grid cell IDs.
 Spatial joins based on coordinates for other units:
 
 - constituencies
@@ -378,10 +374,69 @@ woRkshoptools::include_picture("cheatsheet.png")
 
 ---
 
+## Data Aggregation
+
+If you want to aggregate attributes and geometries of a shapefile, you can rely on `st_combine(x)` , `st_union(x,y)` and `st_intersection(x,y)` to combine shapefiles, resolve borders and return the intersection of two shapefiles. 
+
+For raster data, you can aggregate with the function `terra::aggregate()`(if you have matching raster files) in combination with `terra::resample()` (if your raster files don't match).
+
+To deal with spatial misalignment:
+- [`smile` package](https://lcgodoy.me/smile/)
+- [`areal` package](https://chris-prener.github.io/areal/)
+
+---
+
+## Data Aggregation
+
+.pull-left[
+```{r aggregate-data, eval=FALSE}
+
+german_districts <-
+  sf::read_sf("./data/VG250_KRS.shp") %>% 
+  sf::st_transform(3035) %>% 
+  dplyr::mutate(federal_state =
+                  as.numeric(stringr::str_sub(AGS,1,2))) 
+
+german_states <-
+  german_districts %>% 
+  dplyr::group_by(federal_state) %>% 
+  dplyr::summarize(geometry = 
+                     st_union(geometry))
+
+
+tm_shape(german_states) + 
+  tm_borders()
+
+```
+]
+
+.pull-right[
+```{r aggregate-data-map, echo = F}
+
+
+german_districts <-
+  sf::read_sf("./data/VG250_KRS.shp") %>% 
+  sf::st_transform(3035) %>% 
+  dplyr::mutate(federal_state = as.numeric(stringr::str_sub(AGS,1,2))) 
+
+german_states <-
+  german_districts %>% 
+  dplyr::group_by(federal_state) %>% 
+  dplyr::summarize(geometry = st_union(geometry))
+
+
+tm_shape(german_states) + 
+  tm_borders()
+
+```
+]
+
+---
+
 ## Fake Research Question
 
 .pull-left[
-Say we're interested in the impact of the current pandemic on individual well-being in the geographic context.
+Say we're interested in the impact of neighbourhood characteristics (e.g. mobility infrastructure) on individual-level attitudes towards energy transition.
 
 We plan to conduct a survey in the state of North-Rhine Westphalia.
 ]
@@ -562,6 +617,7 @@ sampling_area_attributes <-
   sf::st_join(.,
               sampling_area, 
               join = sf::st_intersects, 
+              # keep only districts that are intersecting
               left = FALSE) %>% 
   # add attribute table
   dplyr::left_join(. , 
@@ -667,7 +723,7 @@ sampling_area_attributes <-
 
 We got that Information from the INKAR database: Population-weighted linear distance to the nearest public transport stop with at least 20 departures per day.
 
-```{r transport-map-disp, echo=F}
+```{r transport-map-disp, echo=F, out.width="50%", out.height="50%"}
 
   tm_shape(sampling_area_attributes) + 
   tm_polygons(col = 
@@ -819,7 +875,7 @@ So, let's try to operationalize the variables on a smaller level of aggregation.
 
 ## Charging stations in 5000m Buffer
 
-The procedure for calculating the number of chargers in a 5km buffer is very similar to calculating the buffers in a district.
+The procedure for calculating the number of chargers in a 5km buffer is very similar to calculating the chargers in a district.
 
 ```{r charging-stations}
 
