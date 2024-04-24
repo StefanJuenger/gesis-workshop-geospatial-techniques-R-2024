@@ -1,6 +1,10 @@
 # Workshop "Introduction to Geospatial Techniques for Social Scientists in R" (April 23/24, 2024)
 
 <p align=center>   
+<a href="https://github.com/StefanJuenger/gesis-workshop-geospatial-techniques-R-2024/archive/refs/heads/main.zip"><b>CLICK HERE FOR DOWNLOAD ALL COURSE MATERIALS</b></a> 
+</p>
+
+<p align=center>   
 <a href="https://stefanjuenger.github.io/gesis-workshop-geospatial-techniques-R-2024/"><b>CLICK HERE FOR AN UNCLUTTERED VIEW</b></a> 
 </p>
 
