@@ -515,7 +515,7 @@ We will use plenty of different packages during the course, but only a few are o
 - [`sfdep`](https://cran.r-project.org/web/packages/sfdep/index.html)
 - [`spdep`](https://cran.r-project.org/web/packages/spdep/index.html)
 - [`terra`](https://cran.r-project.org/web/packages/terra/index.html)
-- **[`tiygeocoder`](https://cloud.r-project.org/web/packages/tidygeocoder/index.html)**
+- **[`tidygeocoder`](https://cloud.r-project.org/web/packages/tidygeocoder/index.html)**
 - [`tmap`](https://cran.r-project.org/web/packages/tmap/index.html)
 - [`tmaptools`](https://cran.r-project.org/web/packages/tmaptools/index.html)
 - [`raster`](https://cran.r-project.org/web/packages/raster/index.html)
